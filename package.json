@@ -153,6 +153,8 @@
          *          }
          *      }
          */
-        "requires": []
+        "requires": [
+            "zan-ui"   // API debugging UI is in here
+        ]
     }
 }
