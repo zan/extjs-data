@@ -43,6 +43,11 @@ Ext.define('Zan.data.grid.EntityGridPanel', {
          * todo: example
          */
         fieldColumns: null,
+
+        /**
+         * @cfg {Array} Additional fields to include in the API response when refreshing the grid
+         */
+        responseFields: null,
     },
 
     bbar: {
@@ -73,12 +78,7 @@ Ext.define('Zan.data.grid.EntityGridPanel', {
             session: this.lookupSession(),
             pageSize: 100,
             includeEditabilityMetadata: includeEditabilityMetadata,
-            // todo: allow configuring this, dynamically generate from available columns?
-            extraParams: {
-                // extraResponseFields: [
-                //
-                // ],
-            }
+            responseFields: this.getResponseFields()
         });
     },
 
