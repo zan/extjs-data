@@ -11,6 +11,11 @@ Ext.define('Zan.data.store.EntityStore', {
          * @cfg {boolean} If true, include metadata related to whether the record can be edited
          */
         includeEditabilityMetadata: false,
+
+        /**
+         * @cfg {Array} Additional fields to request from the API when loading this store
+         */
+        responseFields: null,
     },
 
     remoteSort: true,
@@ -49,6 +54,15 @@ Ext.define('Zan.data.store.EntityStore', {
         this.callParent([config]);
     },
 
+    load: function(options) {
+        // Ensure extra params are synced
+        if (this.getResponseFields()) {
+            this.getProxy().setExtraParam('responseFields', this.getResponseFields());
+        }
+
+        return this.callParent([ options ]);
+    },
+
     async ensureLoaded(source) {
         const deferred = new Ext.Deferred();
 
@@ -71,7 +85,7 @@ Ext.define('Zan.data.store.EntityStore', {
         else {
             this._zanIsLoading = true;
             this.load({
-                callback(records, operation, success) {
+                callback: function(records, operation, success) {
                     deferred.resolve();
                 }
             });
