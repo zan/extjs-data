@@ -1,5 +1,23 @@
 /**
  * todo: should be BaseEntityModel
+ *
+ * ### Using entity models from the console
+ *
+ * Load a model:
+ *
+ *   var u = App.model.UserModel.load(4);
+ *
+ * Load a model with additional parameters:
+ *
+ *   var u = App.model.StowersUserModel.load(4, { params: { responseFields: ['defaultDepartment'] } });
+ *
+ *
+ * Accessing associations:
+ *
+ *   var u = App.model.StowersUserModel.load(4, { params: { responseFields: ['defaultDepartment'] } });
+ *   // Wait for the model to load
+ *   u.getDefaultDepartment();
+ *
  */
 Ext.define('Zan.data.model.EntityModel', {
     extend: 'Ext.data.Model',
