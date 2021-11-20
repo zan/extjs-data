@@ -54,7 +54,7 @@ Ext.define('Zan.data.grid.column.Text', {
             // Immediately check isLoading(), if true an async request has been triggered
             if (value && value.isLoading()) {
                 // This is an exception because it probably means 1 API request per grid row (for each column to load)
-                throw("Grid lazy loading detected in " + this.dataIndex);
+                throw new Error("Grid lazy loading detected in field '" + this.dataIndex + "'. Ensure this field is returned from the API by using the responseFields configuration.");
             }
         }
 
