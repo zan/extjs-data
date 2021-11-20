@@ -30,13 +30,18 @@ Ext.define('Zan.data.proxy.ZanRestProxy', {
         }
 
         if (!success) {
-            // todo: fancier debugging
+            // Raw URL without parameters: request.getRawRequest().requestOptions.url
+            var requestUrl = request.getRawRequest().requestOptions.url;
             var requestDebugLink = '#/zan/data/api-viewer?';
-            requestDebugLink += 'requestUrl=' + encodeURIComponent(request.getUrl());
+            requestDebugLink += 'requestUrl=' + encodeURIComponent(requestUrl);
             requestDebugLink += '&requestMethod=' + encodeURIComponent(request.getMethod());
-            // todo: need to check for GET parameters
+
             if ('POST' === request.getMethod() || 'PUT' === request.getMethod() || 'PATCH' === request.getMethod()) {
                 requestDebugLink += '&requestData=' + encodeURIComponent(JSON.stringify(request.getJsonData()));
+            }
+            if ('GET' === request.getMethod()) {
+                //requestDebugLink += '&requestData=' + encodeURIComponent(JSON.stringify(request.getParams()));
+                // Parameters are already part of the URL
             }
 
             var messageHtml = [
