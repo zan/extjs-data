@@ -48,6 +48,11 @@ Ext.define('Zan.data.grid.EntityGridPanel', {
          * @cfg {Array} Additional fields to include in the API response when refreshing the grid
          */
         responseFields: null,
+
+        /**
+         * @cfg {boolean} Passed through to the Ext.data.Store backing this grid
+         */
+        autoLoad: false,
     },
 
     bbar: {
@@ -78,7 +83,8 @@ Ext.define('Zan.data.grid.EntityGridPanel', {
             session: this.lookupSession(),
             pageSize: 100,
             includeEditabilityMetadata: includeEditabilityMetadata,
-            responseFields: this.getResponseFields()
+            responseFields: this.getResponseFields(),
+            autoLoad: this.getAutoLoad()
         });
     },
 
