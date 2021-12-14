@@ -12,14 +12,8 @@ Ext.define('Zan.data.field.Date', {
         zanLabelableField: 'Zan.data.model.LabelableFieldMixin'
     },
 
-    constructor: function (config) {
-        config = Zan.Object.setDefaults(config, {
-            allowNull: true,
-            dateFormat: 'c',
-        });
-
-        this.callParent([config]);
-    },
+    allowNull: true,
+    dateFormat: 'c',
 
     getType: function() {
         return 'zan-date';
