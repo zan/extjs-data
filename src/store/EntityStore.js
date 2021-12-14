@@ -55,9 +55,14 @@ Ext.define('Zan.data.store.EntityStore', {
     },
 
     load: function(options) {
-        // Ensure extra params are synced
-        if (this.getResponseFields()) {
-            this.getProxy().setExtraParam('responseFields', this.getResponseFields());
+        options = options || {};
+
+        // pass 'responseFields' in params when parent store loads
+        if (this.getResponseFields() && Ext.isObject(options)) {
+            options.params = options.params || {};
+            options.params = Ext.apply(options.params, {
+                responseFields: this.getResponseFields()
+            });
         }
 
         return this.callParent([ options ]);
