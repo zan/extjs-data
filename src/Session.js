@@ -42,10 +42,20 @@ Ext.define('Zan.data.Session', {
     },
 
     _ensureRecordInSession: function(record) {
+        // todo: do we need this method? even catch the exception below still generates an error + trace in the console
+        return;
+
         var exists = this.peekRecord(Ext.getClassName(record), record.getId());
 
         if (!exists) {
-            this.adopt(record);
+            // When loading nested records, such as a user with defaultDepartment and departments that contain the
+            // same model this generates an exception
+            // The peekRecord call above returns false, but this gives an error: Ext.data.Session.add(): Duplicate id 22 for App.model.DepartmentModel
+            // todo: is this an Ext bug? find a workaround?
+            try {
+                this.adopt(record);
+            } catch (ex) {}
+
         }
     }
 });
