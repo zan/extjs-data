@@ -3,6 +3,7 @@ Ext.define('Zan.data.button.SaveButton', {
     alias: 'widget.zan-savebutton',
 
     config: {
+        record: null,
         store: null,
     },
 
@@ -15,9 +16,34 @@ Ext.define('Zan.data.button.SaveButton', {
     text: 'Save',
     iconCls: 'x-fa fa-save',
 
+    // Enabled when there's data to save
+    disabled: true,
+
     bind: {
         //iconCls: '{isDirty ? "x-fas fa-save" : "x-far fa-save"}',
         disabled: '{!isDirty}',
+    },
+
+    afterRender: function() {
+        this.callParent(arguments);
+
+        // Models don't support events, so we need to poll them to see if they are dirty
+        var runner = new Ext.util.TaskRunner();
+        runner.start({
+            run: function() {
+                // Nothing to do unless there's a record
+                if (!this.getRecord()) return;
+
+                this.getViewModel().set('isDirty', this.getRecord().isDirty());
+            },
+            scope: this,
+            interval: 500,
+        });
+
+        // Clean up all tasks and the runner when this component is destroyed
+        this.on('destroy', function() {
+            runner.destroy();
+        });
     },
 
     handler: function() {
@@ -25,6 +51,9 @@ Ext.define('Zan.data.button.SaveButton', {
         // todo: disable button before save starts to prevent double click
         if (this.getStore()) {
             this.getStore().sync();
+        }
+        if (this.getRecord()) {
+            this.getRecord().save();
         }
     },
 
