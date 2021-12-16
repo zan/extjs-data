@@ -3,9 +3,12 @@ Ext.define('Zan.data.controller.ZanPackageRoutingController', {
 
     requires: [
         'Zan.data.page.ApiViewerPage',
+        'Zan.ui.RoutingHelper',
     ],
 
-    routes: Zan.ui.RoutingHelper.linkToPages({
-        '/zan/data/api-viewer':        'Zan.data.page.ApiViewerPage',
-    }),
+    init: function() {
+        this.setRoutes(Zan.ui.RoutingHelper.linkToPages({
+            '/zan/data/api-viewer':        'Zan.data.page.ApiViewerPage',
+        }));
+    }
 });
