@@ -49,6 +49,7 @@ Ext.define('Zan.data.button.SaveButton', {
     handler: function() {
         // todo: fancy spinner
         // todo: disable button before save starts to prevent double click
+        // todo: error handling
         if (this.getStore()) {
             this.getStore().sync();
         }
