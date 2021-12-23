@@ -1,6 +1,8 @@
 /**
  * todo features:
  *  - automatically load store on render or activate? test in tab panel
+ *
+ *  todo: split editability out into an editable version of this grid?
  */
 Ext.define('Zan.data.grid.EntityGridPanel', {
     extend: 'Ext.grid.Panel',
