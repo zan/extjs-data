@@ -19,6 +19,7 @@ Ext.define('Zan.data.store.EntityStore', {
     },
 
     remoteSort: true,
+    remoteFilter: true,
 
     constructor: function (config) {
         /*
