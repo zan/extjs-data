@@ -12,13 +12,7 @@ Ext.define('Zan.data.field.Boolean', {
         zanLabelableField: 'Zan.data.model.LabelableFieldMixin'
     },
 
-    constructor: function (config) {
-        config = Zan.Object.setDefaults(config, {
-            allowNull: true,
-        });
-
-        this.callParent([config]);
-    },
+    allowNull: true,
 
     getType: function() {
         return 'zan-bool';
