@@ -1,5 +1,6 @@
 Ext.define('Zan.data.store.DebugRequestLogStore', {
     extend: 'Ext.data.Store',
+    singleton: true,
 
     requires: [
         'Zan.data.model.RestRequestModel'
@@ -11,5 +12,4 @@ Ext.define('Zan.data.store.DebugRequestLogStore', {
     sorters: [
         { property: 'responseAt', direction: 'DESC' },
     ]
-
 });
