@@ -2,9 +2,18 @@ Ext.define('Zan.data.button.SaveButton', {
     extend: 'Ext.button.Button',
     alias: 'widget.zan-savebutton',
 
+    requires: [
+        'Ext.window.Toast',
+    ],
+
     config: {
         record: null,
         store: null,
+
+        successToastMessage: 'Data Saved',
+
+        successHandler: null,
+        scope: null,
     },
 
     viewModel: {
@@ -28,6 +37,8 @@ Ext.define('Zan.data.button.SaveButton', {
         this.callParent(arguments);
 
         // Models don't support events, so we need to poll them to see if they are dirty
+        // todo: ViewModel docs seem to think you can, needs multiple bind properties?
+        // https://docs.sencha.com/extjs/7.5.0/classic/Ext.app.ViewModel.html
         var runner = new Ext.util.TaskRunner();
         runner.start({
             run: function() {
@@ -54,7 +65,22 @@ Ext.define('Zan.data.button.SaveButton', {
             this.getStore().sync();
         }
         if (this.getRecord()) {
-            this.getRecord().save();
+            this.getRecord().save({
+                success: function(record, operation) {
+                    if (this.getSuccessToastMessage()) {
+                        Ext.toast(this.getSuccessToastMessage());
+                    }
+
+                    if (this.getSuccessHandler()) {
+                        this.getSuccessHandler().call(this.getScope(), this);
+                    }
+                },
+                failure: function(record, operation) {
+                    // todo: better handling
+                    console.warn("Save failed!");
+                },
+                scope: this
+            });
         }
     },
 
