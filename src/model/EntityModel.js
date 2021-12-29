@@ -32,6 +32,7 @@ Ext.define('Zan.data.model.EntityModel', {
         // If true, this record can be edited. See Zan.data.reader.EntityReader for where this is calculated
         // todo: should this really be a field? can it be an object property?
         { name: '_isEditable', type: 'bool', allowNull: true, persist: false, },
+        { name: '_editableFields', type: 'auto', default: {}, persist: false },
     ],
 
     inheritableStatics: {
@@ -105,6 +106,13 @@ Ext.define('Zan.data.model.EntityModel', {
         else {
             return this.set(fieldName, value);
         }
+    },
+
+    /**
+     * Returns true if fieldName is editable by the current user
+     */
+    isFieldEditable: function(fieldName) {
+        return Ext.Object.getKey(this.get('_editableFields'), fieldName) !== null;
     },
 
     //todo: may not be necessary if form updateRecord() can be smarter?
