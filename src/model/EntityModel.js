@@ -26,6 +26,7 @@ Ext.define('Zan.data.model.EntityModel', {
         'Zan.data.field.Boolean',
         'Zan.data.field.Integer',
         'Zan.data.field.String',
+        'Zan.data.model.WorkflowModel'
     ],
 
     fields: [
@@ -33,6 +34,13 @@ Ext.define('Zan.data.model.EntityModel', {
         // todo: should this really be a field? can it be an object property?
         { name: '_isEditable', type: 'bool', allowNull: true, persist: false, },
         { name: '_editableFields', type: 'auto', default: {}, persist: false },
+        { name: 'workflow', type: 'zan-association',
+            reference: {
+                type: 'Zan.data.model.WorkflowModel',
+                role: 'workflow',
+                unique: true,
+            }
+        }
     ],
 
     inheritableStatics: {
