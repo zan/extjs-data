@@ -51,34 +51,36 @@ Ext.define('Zan.data.model.EntityModel', {
          * @param {object} options
          * @param session
          * @returns {Zan.data.model.EntityModel}
+         *
+         * todo: is this necessary?
          */
-        load: function(id, options, session) {
-            // Numeric ID can be processed as normal
-            if (Ext.isNumeric(id)) {
-                return this.callParent([id, options, session]);
-            }
-
-            // For a string, the id should be sent as the 'identifier' parameter
-            options = options || {};
-            var data = {},
-                rec;
-
-            if (session) {
-                // todo: remove this or make it work with alternate identifiers
-                rec = session.peekRecord(this, id);
-            }
-
-            if (!rec) {
-                rec = new this(data, session);
-            }
-
-            options.params = Zan.Object.setDefaults(options.params, {
-                identifier: id
-            });
-            rec.load(options);
-
-            return rec;
-        }
+        // load: function(id, options, session) {
+        //     // Numeric ID can be processed as normal
+        //     if (Ext.isNumeric(id)) {
+        //         return this.callParent([id, options, session]);
+        //     }
+        //
+        //     // For a string, the id should be sent as the 'identifier' parameter
+        //     options = options || {};
+        //     var data = {},
+        //         rec;
+        //
+        //     if (session) {
+        //         // todo: remove this or make it work with alternate identifiers
+        //         rec = session.peekRecord(this, id);
+        //     }
+        //
+        //     if (!rec) {
+        //         rec = new this(data, session);
+        //     }
+        //
+        //     options.params = Zan.Object.setDefaults(options.params, {
+        //         identifier: id
+        //     });
+        //     rec.load(options);
+        //
+        //     return rec;
+        // }
     },
 
     /**
