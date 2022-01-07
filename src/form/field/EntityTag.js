@@ -15,9 +15,9 @@ Ext.define('Zan.data.form.field.EntityTag', {
     // todo: necessary?
     autoLoadOnValue: true,
 
-    // This must be false so that the paging controls get fully displayed
-    // Without it, some of them will be cut off depending on the field's width
-    matchFieldWidth: false,
+    // Without this minWidth the paging controls are cut off when there aren't any results
+    // in the picker or when the field is too small
+    minWidth: 375,
 
     triggers: {
         clear: {
