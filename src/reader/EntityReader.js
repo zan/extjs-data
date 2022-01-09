@@ -20,7 +20,6 @@ Ext.define('Zan.data.reader.EntityReader', {
 
         // Store field editability data on the model
         if (rawData && rawData.metadata && rawData.metadata.fieldEditability) {
-            console.log("parsing field stuffs: %o", rawData.metadata.fieldEditability);
             if (Ext.isArray(rawData.data)) {
                 // todo: response that's an array of records with multiple editability information
             }
