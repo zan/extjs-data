@@ -45,7 +45,9 @@ Ext.define('Zan.data.button.SaveButton', {
                 // Nothing to do unless there's a record
                 if (!this.getRecord()) return;
 
-                this.getViewModel().set('isDirty', this.getRecord().isDirty());
+                // todo: probably want a check here to make sure this is only being called on things that implement isAnyAssociationDirty
+                var isDirty = this.getRecord().isDirty() || this.getRecord().isAnyAssociationDirty();
+                this.getViewModel().set('isDirty', isDirty);
             },
             scope: this,
             interval: 500,
