@@ -6,10 +6,6 @@ Ext.define('Zan.data.proxy.ZanRestProxy', {
         'Zan.data.store.DebugRequestLogStore',
     ],
 
-    doRequest(operation) {
-        return this.callParent([operation]);
-    },
-
     processResponse(success, operation, request, response) {
         var requestLogStore = Ext.data.StoreManager.get('Zan.data.DebugRequestLogStore');
 
@@ -53,5 +49,5 @@ Ext.define('Zan.data.proxy.ZanRestProxy', {
         }
 
         return this.callParent([success, operation, request, response]);
-    }
+    },
 });
