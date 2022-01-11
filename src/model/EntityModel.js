@@ -43,6 +43,86 @@ Ext.define('Zan.data.model.EntityModel', {
         }
     ],
 
+    constructor: function() {
+        this._dirtyAssociations = [];
+
+        this.callParent(arguments);
+    },
+
+    /**
+     * Returns true if fieldName is editable by the current user
+     */
+    isFieldEditable: function(fieldName) {
+        return Ext.Object.getKey(this.get('_editableFields'), fieldName) !== null;
+    },
+
+    /**
+     * Returns true if any association should be considered dirty
+     *
+     * This method checks associations in the "hasMany" section. Association in the "fields section are handled as
+     * expected by Ext's isDirty() method.
+     */
+    isAnyAssociationDirty: function() {
+        return this.getDirtyAssociations().length > 0;
+    },
+
+    /**
+     * Returns an array of associations that should be considered dirty
+     *
+     * Returned data is the raw Ext association information
+     *
+     * @returns {*[]}
+     */
+    getDirtyAssociations: function() {
+        var dirty = [];
+
+        Ext.Object.each(this.associations, function(key, association, obj) {
+            if (Ext.Array.contains(this._dirtyAssociations, key)) {
+                dirty.push(association);
+            }
+        }, this);
+
+        return dirty;
+    },
+
+    /**
+     * This method is called by the reader when the model is loaded from remote data
+     *
+     * https://docs.sencha.com/extjs/7.5.0/classic/Ext.data.Model.html#method-onLoad
+     */
+    onLoad: function() {
+        Ext.Object.each(this.associations, function(key, association, obj) {
+            // Only interested in associations that have stores
+            // todo: is there a better way to check this? If not, EXT_VERIFY_AFTER_UPGRADE
+            if (!association.storeName) return true;
+
+            // Flag this association as dirty when anything in the store changes
+            this.zanGet(key).on('datachanged', function() {
+                this._dirtyAssociations.push(key);
+            }, this);
+        }, this);
+    },
+
+    /**
+     * OVERRIDDEN to clear out dirty associations once the model has been saved
+     */
+    save: function(options) {
+        var clearDirtyAssociationsFn = Ext.bind(function() {
+            this._dirtyAssociations = [];
+        }, this);
+
+        // Hook into the existing success handler if one was specified
+        if (options.success) {
+            Ext.Function.interceptAfter(options, 'success', clearDirtyAssociationsFn, this);
+        }
+        // If there's no existing success handler, set our own
+        else {
+            options.success = clearDirtyAssociationsFn;
+        }
+
+        return this.callParent([options]);
+    },
+
     inheritableStatics: {
         /**
          * OVERRIDDEN to provide support for loading by string-based identifiers
@@ -88,19 +168,35 @@ Ext.define('Zan.data.model.EntityModel', {
      *
      *      record.zanGet('requester'); // returns User model from "requester" association
      *
+     * todo: better name would be 'resolve'? leave as 'zan' to indicate it's not a native Ext method?
      * @param fieldName
      * @returns {*}
      */
     zanGet(fieldName) {
-        const field = this.getField(fieldName);
+        // Note that if an association is defined in the 'fields' section it will appear in both fieldsMap and associations
+        var field = this.fieldsMap[fieldName];
+        var association = this.associations[fieldName];
 
-        // Association, use custom getter
-        if (field.reference) {
-            return this[field.reference.getterName]();
+        if (!field && !association) {
+            setTimeout(function() {
+                console.log("Fields: %o", this.fieldsMap);
+                console.log("Associations: %o", this.associations);
+            }, 10);
+            throw new Error("Field '" + fieldName + "' does not exist on " + this.$className);
         }
-        // Delegate to typical getter
-        else {
-            return this.get(fieldName);
+
+        if (field) {
+            // Some fields are also associations
+            if (field.reference) {
+                return this[field.reference.getterName]();
+            }
+            // Delegate to typical getter
+            else {
+                return this.get(fieldName);
+            }
+        }
+        if (association) {
+            return this[association.getterName]();
         }
     },
 
@@ -118,18 +214,11 @@ Ext.define('Zan.data.model.EntityModel', {
         }
     },
 
-    /**
-     * Returns true if fieldName is editable by the current user
-     */
-    isFieldEditable: function(fieldName) {
-        return Ext.Object.getKey(this.get('_editableFields'), fieldName) !== null;
-    },
-
     //todo: may not be necessary if form updateRecord() can be smarter?
     // privates: {
-    //     isEqual(lhs, rhs, field) {
-    //         console.log("[isEqual:%s] %o / %o", field, lhs, rhs);
-    //         var retVal = this.callParent([lhs, rhs, field]);
+    //     isEqual(lhs, rhs) {
+    //         console.log("[isEqual] %o / %o", lhs, rhs);
+    //         var retVal = this.callParent([lhs, rhs]);
     //
     //         // If both items are entity models, compare by ID
     //         if (lhs instanceof Zan.data.model.EntityModel && rhs instanceof Zan.data.model.EntityModel) {
