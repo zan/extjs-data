@@ -1,6 +1,8 @@
 Ext.define('Zan.data.store.EntityStore', {
     extend: 'Ext.data.Store',
 
+    alias: 'store.zan-entitystore',
+
     requires: [
         'Zan.data.reader.EntityReader',
         'Zan.data.util.EntityModelFinder',
@@ -20,6 +22,7 @@ Ext.define('Zan.data.store.EntityStore', {
 
     remoteSort: true,
     remoteFilter: true,
+    pageSize: 100,
 
     constructor: function (config) {
         /*
