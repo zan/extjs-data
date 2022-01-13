@@ -91,6 +91,8 @@ Ext.define('Zan.data.model.EntityModel', {
      * https://docs.sencha.com/extjs/7.5.0/classic/Ext.data.Model.html#method-onLoad
      */
     onLoad: function() {
+        // todo: this is probably a bad idea when eg. 1,000 models are loaded into a grid
+        //  implement a "writable: false" flag on the model so this isn't the default behavior?
         Ext.Object.each(this.associations, function(key, association, obj) {
             // Only interested in associations that have stores
             // todo: is there a better way to check this? If not, EXT_VERIFY_AFTER_UPGRADE
@@ -107,6 +109,8 @@ Ext.define('Zan.data.model.EntityModel', {
      * OVERRIDDEN to clear out dirty associations once the model has been saved
      */
     save: function(options) {
+        options = options || {};
+
         var clearDirtyAssociationsFn = Ext.bind(function() {
             this._dirtyAssociations = [];
         }, this);
