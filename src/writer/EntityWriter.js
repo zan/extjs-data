@@ -27,6 +27,11 @@ Ext.define('Zan.data.writer.EntityWriter', {
             recordData[association.role] = store.collect('id');
         });
 
+        // todo: seems awkward
+        if (Ext.isFunction(record.buildSaveData)) {
+            recordData = record.buildSaveData(recordData);
+        }
+
         return recordData;
     },
 
