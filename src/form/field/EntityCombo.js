@@ -1,6 +1,8 @@
 Ext.define('Zan.data.form.field.EntityCombo', {
     extend: 'Ext.form.field.ComboBox',
 
+    alias: 'widget.zan-entitycombo',
+
     requires: [
         'Zan.data.util.ModelUtil',
     ],
