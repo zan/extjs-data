@@ -127,6 +127,35 @@ Ext.define('Zan.data.model.EntityModel', {
         return this.callParent([options]);
     },
 
+    /**
+     * Performs a save() call and returns a promise
+     */
+    promisedSave: async function(options) {
+        options = options || {};
+        var deferred = new Ext.Deferred();
+
+        // Hook into the existing success handler if one was specified
+        if (options.success) {
+            Ext.Function.interceptAfter(options, 'success', function(record, operation) {
+                console.log("[promisedSaveIntercept] resolving with %o", record);
+                deferred.resolve(record);
+            });
+        }
+        // If there's no existing success handler, set our own
+        else {
+            options.success = function(record, operation) {
+                console.log("[promisedSave] resolving with %o", record);
+                deferred.resolve(record);
+            };
+        }
+
+        // todo: reject on failure
+
+        this.save(options);
+
+        return deferred.promise;
+    },
+
     inheritableStatics: {
         /**
          * OVERRIDDEN to provide support for loading by string-based identifiers
