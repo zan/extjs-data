@@ -137,14 +137,12 @@ Ext.define('Zan.data.model.EntityModel', {
         // Hook into the existing success handler if one was specified
         if (options.success) {
             Ext.Function.interceptAfter(options, 'success', function(record, operation) {
-                console.log("[promisedSaveIntercept] resolving with %o", record);
                 deferred.resolve(record);
             });
         }
         // If there's no existing success handler, set our own
         else {
             options.success = function(record, operation) {
-                console.log("[promisedSave] resolving with %o", record);
                 deferred.resolve(record);
             };
         }
