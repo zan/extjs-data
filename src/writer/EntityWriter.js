@@ -5,6 +5,14 @@ Ext.define('Zan.data.writer.EntityWriter', {
     extend: 'Ext.data.writer.Json',
     alias: 'writer.zan-entity',
 
+    // This means that when creating new records only send changes
+    // By default, all fields are sent, which means a lot of extra defaulting and "empty" cases
+    // that need to be handled
+    // See: https://docs.sencha.com/extjs/7.5.0/classic/Ext.data.writer.Json.html#cfg-allDataOptions
+    allDataOptions: {
+        changes: true,
+    },
+
     /**
      * OVERRIDDEN for improved record handling, see _processRawRecord
      */

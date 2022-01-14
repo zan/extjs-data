@@ -6,6 +6,17 @@ Ext.define('Zan.data.proxy.ZanRestProxy', {
         'Zan.data.store.DebugRequestLogStore',
     ],
 
+    // disable the "_dc" cache busting parameter by default since requests will almost always have a query string anyway
+    noCache: false,
+
+    reader: {
+        type: 'zan-entity',
+    },
+
+    writer: {
+        type: 'zan-entity',
+    },
+
     processResponse(success, operation, request, response) {
         var requestLogStore = Ext.data.StoreManager.get('Zan.data.DebugRequestLogStore');
 
