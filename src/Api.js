@@ -1,9 +1,14 @@
 Ext.define('Zan.data.Api', {
     singleton: true,
 
-    makeRequest(url, method, params) {
+    get: async function(url, params) {
+        return this.makeRequest(url, 'GET', params);
+    },
+
+    makeRequest: async function(url, method, params) {
         var me = this;
         var deferred = new Ext.Deferred();
+        params = params || {};
 
         var responseInfo = {
             requestSuccessful: null,
@@ -11,6 +16,14 @@ Ext.define('Zan.data.Api', {
             sfProfilerToken: null,
             sfProfilerUrl: null,
         };
+
+        // Log this request in the request store
+        var debugRestRequest = Zan.data.store.DebugRequestLogStore.add({
+            url: url,
+            method: method,
+            parameters: params,
+        })[0];
+        console.log("rest request is: %o", debugRestRequest);
 
         var requestConfig = {
             method: method,
@@ -27,9 +40,14 @@ Ext.define('Zan.data.Api', {
             failure: (response, opts) => {
                 responseInfo = me._parseRawResponse(response);
                 responseInfo.requestSuccessful = false;
+                debugRestRequest.set('isError', true);
 
                 deferred.resolve(responseInfo);
-            }
+            },
+
+            callback: function(options, wasSuccessful, response) {
+                debugRestRequest.set('responseAt', new Date());
+            },
         };
 
         if (Ext.Array.contains(['POST', 'PUT', 'PATCH'], method)) {
@@ -42,7 +60,7 @@ Ext.define('Zan.data.Api', {
         return deferred.promise;
     },
 
-    _parseRawResponse(response) {
+    _parseRawResponse: function(response) {
         var responseInfo = {
             requestSuccessful: null,
             responseData: null,
