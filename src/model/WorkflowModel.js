@@ -1,7 +1,7 @@
 /**
  * Represents a server-defined workflow
  *
- * todo: more docs on the format of "places" and "enabledTransitions", should they be models?
+ * todo: more docs on the format of "places" and "validGraphTransitions", should they be models?
  */
 Ext.define('Zan.data.model.WorkflowModel', {
     extend: 'Ext.data.Model',
@@ -10,7 +10,7 @@ Ext.define('Zan.data.model.WorkflowModel', {
         { name: 'name', type: 'string', allowNull: true },
         { name: 'marking', type: 'string', allowNull: true },
         { name: 'places' },
-        { name: 'enabledTransitions' },
+        { name: 'validGraphTransitions' },
     ],
 
     // proxy: {
