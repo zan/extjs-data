@@ -18,6 +18,10 @@
  *   // Wait for the model to load
  *   u.getDefaultDepartment();
  *
+ * ### Saving models
+ *
+ * See Zan.data.writer.EntityWriter for more details on how EntityModels are serialized to json
+ *
  */
 Ext.define('Zan.data.model.EntityModel', {
     extend: 'Ext.data.Model',
@@ -56,6 +60,26 @@ Ext.define('Zan.data.model.EntityModel', {
         return Ext.Object.getKey(this.get('_editableFields'), fieldName) !== null;
     },
 
+    trackDirtyAssociations: function(toTrack) {
+        // todo: exception when told to track an association that doesn't exist?
+        toTrack = toTrack || [];
+
+        Ext.Object.each(this.associations, function(key, association, obj) {
+            // Check if we're limiting to a specific set of associations
+            if (toTrack.length > 0 && !Ext.Array.contains(toTrack, key)) return true; // continue
+
+            var assocField = this.zanGet(key);
+
+            // Store - listen for data changed
+            if (assocField instanceof Ext.data.Store) {
+                // Flag this association as dirty when anything in the store changes
+                assocField.on('datachanged', function() {
+                    this._dirtyAssociations.push(key);
+                }, this);
+            }
+        }, this);
+    },
+
     /**
      * Returns true if any association should be considered dirty
      *
@@ -91,18 +115,7 @@ Ext.define('Zan.data.model.EntityModel', {
      * https://docs.sencha.com/extjs/7.5.0/classic/Ext.data.Model.html#method-onLoad
      */
     onLoad: function() {
-        // todo: this is probably a bad idea when eg. 1,000 models are loaded into a grid
-        //  implement a "writable: false" flag on the model so this isn't the default behavior?
-        Ext.Object.each(this.associations, function(key, association, obj) {
-            // Only interested in associations that have stores
-            // todo: is there a better way to check this? If not, EXT_VERIFY_AFTER_UPGRADE
-            if (!association.storeName) return true;
 
-            // Flag this association as dirty when anything in the store changes
-            this.zanGet(key).on('datachanged', function() {
-                this._dirtyAssociations.push(key);
-            }, this);
-        }, this);
     },
 
     /**
