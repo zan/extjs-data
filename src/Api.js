@@ -5,6 +5,10 @@ Ext.define('Zan.data.Api', {
         return this.makeRequest(url, 'GET', params);
     },
 
+    post: async function(url, params) {
+        return this.makeRequest(url, 'POST', params);
+    },
+
     makeRequest: async function(url, method, params) {
         var me = this;
         var deferred = new Ext.Deferred();
