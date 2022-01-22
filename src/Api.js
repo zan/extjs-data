@@ -2,11 +2,15 @@ Ext.define('Zan.data.Api', {
     singleton: true,
 
     get: async function(url, params) {
-        return this.makeRequest(url, 'GET', params);
+        var rawResult = await this.makeRequest(url, 'GET', params);
+
+        return rawResult.responseData;
     },
 
     post: async function(url, params) {
-        return this.makeRequest(url, 'POST', params);
+        var rawResult = await this.makeRequest(url, 'POST', params);
+
+        return rawResult.responseData;
     },
 
     makeRequest: async function(url, method, params) {
