@@ -49,6 +49,8 @@ Ext.define('Zan.data.model.EntityModel', {
 
     constructor: function() {
         this._dirtyAssociations = [];
+        // Associations currently being tracked for changes
+        this._trackedAssociations = {};
 
         this.callParent(arguments);
     },
@@ -68,6 +70,9 @@ Ext.define('Zan.data.model.EntityModel', {
             // Check if we're limiting to a specific set of associations
             if (toTrack.length > 0 && !Ext.Array.contains(toTrack, key)) return true; // continue
 
+            // Ignore if it's already tracked
+            if (this._trackedAssociations[key]) return true; // continue
+
             var assocField = this.zanGet(key);
 
             // Store - listen for data changed
@@ -77,6 +82,8 @@ Ext.define('Zan.data.model.EntityModel', {
                     this._dirtyAssociations.push(key);
                 }, this);
             }
+
+            this._trackedAssociations[key] = true;
         }, this);
     },
 
