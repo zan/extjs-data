@@ -16,7 +16,7 @@ Ext.define('Zan.data.button.SaveButton', {
         successHandler: null,
         scope: null,
 
-        trackRecordFields: [],
+        trackDirtyAssociations: [],
     },
 
     controller: { xclass: 'Zan.data.button.SaveButtonController' },

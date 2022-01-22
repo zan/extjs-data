@@ -36,7 +36,10 @@ Ext.define('Zan.data.button.SaveButtonController', {
 
     updateTrackedRecord: function(primaryRecord) {
         var view = this.getView();
-        this._trackRecordFields = view.getTrackRecordFields();
+        this._trackDirtyAssociations = view.getTrackDirtyAssociations();
+
+        // Ensure record is tracking these associations
+        primaryRecord.trackDirtyAssociations(this._trackDirtyAssociations);
 
         this._trackedRecords = [];
         // Always track the original record's dirty state
@@ -44,10 +47,15 @@ Ext.define('Zan.data.button.SaveButtonController', {
             this._trackedRecords.push(primaryRecord);
 
             // Process additional fields to see how to trakc them
-            Ext.Array.forEach(this._trackRecordFields, function(subFieldName) {
+            Ext.Array.forEach(this._trackDirtyAssociations, function(subFieldName) {
                 var field = primaryRecord.zanGet(subFieldName);
                 if (field instanceof Ext.data.Model) {
                     this._trackedRecords.push(field);
+                }
+                if (field instanceof Ext.data.Store) {
+                    field.on('datachanged', function() {
+                        this.getViewModel().set('isDirty', true);
+                    }, this);
                 }
             }, this);
         }
@@ -64,12 +72,16 @@ Ext.define('Zan.data.button.SaveButtonController', {
         // Commit any models with changes
         for (var i=0; i < this._dirtyRecords.length; i++) {
             var dirtyRecord = this._dirtyRecords[i];
-            console.log("saving %o", dirtyRecord);
             await dirtyRecord.promisedSave();
         }
 
         this._dirtyRecords = [];
         this.clearDirty();
+
+        var successHandler = this.getView().getSuccessHandler();
+        if (successHandler) {
+            successHandler.call(this.getView().getScope(), this.getView());
+        }
     },
 
     markAsDirty: function() {
