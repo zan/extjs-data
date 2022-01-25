@@ -1,3 +1,7 @@
+/**
+ * todo: this should be split into a rest proxy with API debugging integration and an EntityRestProxy that incorporates
+ * the default readers
+ */
 Ext.define('Zan.data.proxy.ZanRestProxy', {
     extend: 'Ext.data.proxy.Rest',
     alias: 'proxy.zan-rest',
