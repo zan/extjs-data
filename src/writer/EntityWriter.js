@@ -35,9 +35,11 @@ Ext.define('Zan.data.writer.EntityWriter', {
             recordData[association.role] = store.collect('id');
         });
 
-        // todo: seems awkward
-        if (Ext.isFunction(record.buildSaveData)) {
-            recordData = record.buildSaveData(recordData);
+        // todo: better way to handle this?
+        //  currently used on AppUserRoleModel because 'role' association name conflicts with internal role so it
+        //  needs to be renamed before persisting to the server
+        if (Ext.isFunction(record.zanModifySaveData)) {
+            record.zanModifySaveData(recordData);
         }
 
         return recordData;
