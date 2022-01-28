@@ -6,7 +6,7 @@ Ext.define('Zan.data.form.RecordFormPanel', {
     },
 
     viewModel: {
-        xclass: 'Zan.ui.ViewModel'
+        xclass: 'Zan.data.ViewModel'
     },
 
     // todo: automatic way to do this?
