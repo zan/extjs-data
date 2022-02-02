@@ -31,7 +31,7 @@ Ext.define('Zan.data.button.SaveButtonController', {
 
     clearTrackedItems: function() {
         this._trackedItems.each(function(item) {
-            this._untrackItem(item);
+            this.untrackItem(item);
         }, this);
     },
 
