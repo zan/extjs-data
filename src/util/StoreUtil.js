@@ -5,6 +5,37 @@ Ext.define('Zan.data.util.StoreUtil', {
     singleton: true,
 
     /**
+     * Calls store.sync() and returns a promise
+     *
+     * @param {Ext.data.Store} store
+     * @param {object} options
+     * @returns {Promise<any>|Ext.promise}
+     */
+    sync: function(store, options) {
+        options = options || {};
+        var deferred = new Ext.Deferred();
+
+        // Hook into the existing success handler if one was specified
+        if (options.success) {
+            Ext.Function.interceptAfter(options, 'success', function(record, operation) {
+                deferred.resolve(record);
+            });
+        }
+        // If there's no existing success handler, set our own
+        else {
+            options.success = function(record, operation) {
+                deferred.resolve(record);
+            };
+        }
+
+        // todo: reject on failure
+
+        store.sync(options);
+
+        return deferred.promise;
+    },
+
+    /**
      * Synchronizes the store's records to match the records in setRecords
      *
      * This method ensures that the store's remove() and add() methods are called so that store methods like

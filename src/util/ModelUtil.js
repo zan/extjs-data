@@ -5,6 +5,37 @@ Ext.define('Zan.data.util.ModelUtil', {
     singleton: true,
 
     /**
+     * Calls record.save() and returns a promise
+     *
+     * @param {Ext.data.Model} record
+     * @param {object} options
+     * @returns {Promise<any>|Ext.promise}
+     */
+    save: function(record, options) {
+        options = options || {};
+        var deferred = new Ext.Deferred();
+
+        // Hook into the existing success handler if one was specified
+        if (options.success) {
+            Ext.Function.interceptAfter(options, 'success', function(record, operation) {
+                deferred.resolve(record);
+            });
+        }
+        // If there's no existing success handler, set our own
+        else {
+            options.success = function(record, operation) {
+                deferred.resolve(record);
+            };
+        }
+
+        // todo: reject on failure
+
+        record.save(options);
+
+        return deferred.promise;
+    },
+
+    /**
      * Updates fieldName on record to newValue if newValue is not the same "entity value"
      *
      * "Entity values" are equivalent if they are represented the same way on the server.
