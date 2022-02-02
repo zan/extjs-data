@@ -30,6 +30,46 @@ Ext.define('Zan.data.util.ModelUtil', {
         return entityValueA === entityValueB;
     },
 
+    /**
+     * Gets the value of fieldOrAssociation from record
+     *
+     * This method will return the following:
+     *  - For normal model fields, this returns the same as record.get('field')
+     *  - For "to one" associations, it returns a model
+     *  - For "to many" associations it returns a store
+     *
+     * @param {Ext.data.Model} record
+     * @param {string} fieldOrAssociation
+     * @returns {*}
+     */
+    getValue: function(record, fieldOrAssociation) {
+        // Note that if an association is defined in the 'fields' section it will appear in both fieldsMap and associations
+        var field = record.fieldsMap[fieldOrAssociation];
+        var association = record.associations[fieldOrAssociation];
+
+        if (!field && !association) {
+            setTimeout(function() {
+                console.log("Fields: %o", this.fieldsMap);
+                console.log("Associations: %o", this.associations);
+            }, 10);
+            throw new Error("Field '" + fieldOrAssociation + "' does not exist on " + record.$className);
+        }
+
+        if (field) {
+            // Some fields are also associations
+            if (field.reference) {
+                return record[field.reference.getterName]();
+            }
+            // Delegate to typical getter
+            else {
+                return record.get(fieldOrAssociation);
+            }
+        }
+        if (association) {
+            return record[association.getterName]();
+        }
+    },
+
     _resolveEntityValue: function(value) {
         if (value instanceof Ext.data.Model) {
             return value.getId();
