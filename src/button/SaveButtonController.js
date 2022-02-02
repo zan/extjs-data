@@ -39,7 +39,9 @@ Ext.define('Zan.data.button.SaveButtonController', {
         this._trackDirtyAssociations = view.getTrackDirtyAssociations();
 
         // Ensure record is tracking these associations
-        primaryRecord.trackDirtyAssociations(this._trackDirtyAssociations);
+        if (this._trackDirtyAssociations.length > 0) {
+            primaryRecord.trackDirtyAssociations(this._trackDirtyAssociations);
+        }
 
         this._trackedRecords = [];
         // Always track the original record's dirty state
