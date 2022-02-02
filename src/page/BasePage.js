@@ -1,3 +1,21 @@
+/**
+ * ### Loading models
+ *
+    viewModel: {
+        links: {
+            pageRecord: {
+                type: 'App.model.ExampleModel',
+                identifier: '{zanRouteParams.publicId}',
+                params: {
+                    includeMetadata: ['fieldEditability'],
+                    responseFields: [
+                        'createdBy',
+                    ],
+                },
+            }
+        }
+    }
+ */
 Ext.define('Zan.data.page.BasePage', {
     extend: 'Ext.panel.Panel',
     requires: [
