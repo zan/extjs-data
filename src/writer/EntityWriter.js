@@ -27,22 +27,71 @@ Ext.define('Zan.data.writer.EntityWriter', {
     getRecordData: function(record, operation) {
         var recordData = this.callParent(arguments);
 
-        // Add in data from any dirty associations
-        // todo: does this work for other kinds of associations?
-        // todo: should rename getDirtyAssociations() to something like getDirtyStoreAssociations()?
-        Ext.Array.forEach(record.getDirtyAssociations(), function(association) {
-            var store = record[association.getterName]();
-            recordData[association.role] = store.collect('id');
-        });
+        // todo: writefields triggers additional http GET (??) requests on save when this is enabled
+        //  to reproduce, on the user edit page, add write fields userDepartmentMappings, userDepartmentMappings.user, userDepartmentMappings.department
+        // var writeFields = record.getWriteFields();
+        //
+        // Ext.Array.forEach(writeFields, function(item) {
+        //     this._resolveFieldValueAndStore(record, item, recordData);
+        // }, this);
 
-        // todo: better way to handle this?
-        //  currently used on AppUserRoleModel because 'role' association name conflicts with internal role so it
-        //  needs to be renamed before persisting to the server
+        // todo: is this feature actually necessary? was originally added to work around 'role' name conflict, but that
+        //  was resolved by renaming the associationRole to 'permissionsRole'
         if (Ext.isFunction(record.zanModifySaveData)) {
             record.zanModifySaveData(recordData);
         }
 
         return recordData;
+    },
+
+    /**
+     *
+     */
+    _resolveFieldValueAndStore: function(record, fieldPath, destination) {
+        // If there's a dot in it, we need to recurse
+        if (fieldPath.includes('.')) {
+            var parsed = fieldPath.split('.');
+            var parentPath = parsed[0];
+            var parent = Zan.data.util.ModelUtil.getValue(record, parentPath);  // first element of the array is used to look up the new 'record'
+            var childPath = parsed.slice(1).join('.');     // remaining array elements are used to recurse into the record
+
+            this._resolveFieldValueAndStore(parent, childPath, destination[parentPath]);
+            return;
+        }
+
+        // Special case: record is a store, we need to iterate over every item in the store and append to 'destination'
+        if (record instanceof Ext.data.Store) {
+            var storeRecords = record.getRange();
+            // Destination will have already been created as an array by a previous pass of this method
+            for (var i=0; i < destination.length; i++) {
+                this._resolveFieldValueAndStore(storeRecords[i], fieldPath, destination[i]);
+            }
+        }
+        // Typical case: record is a single record
+        if (record instanceof Ext.data.Model) {
+            var value = Zan.data.util.ModelUtil.getValue(record, fieldPath);
+            // If the "value" is a store, write an array of record IDs
+            if (value instanceof Ext.data.Store) {
+                var store = value;
+                // Write store records to an array
+                if (Ext.isEmpty(destination[fieldPath])) destination[fieldPath] = [];
+                // Write record IDs
+                store.each(function(record) {
+                    var recordData = record.getData({ critical: true, changes: true });
+
+                    // Phantom records have auto-generated Ext IDs which shouldn't get use (server will generate a new one)
+                    if (record.isPhantom()) {
+                        delete recordData.id;
+                    }
+
+                    destination[fieldPath].push(recordData);
+                });
+            }
+            // For a record, use the ID
+            if (value instanceof Ext.data.Model) {
+                destination[fieldPath] = value.getId();
+            }
+        }
     },
 
     /**

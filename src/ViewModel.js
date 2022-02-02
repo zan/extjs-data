@@ -60,6 +60,12 @@ Ext.define('Zan.data.ViewModel', {
                 {
                     params: params,
                     success: function(record, opts) {
+                        // Apply writeFields, if specified
+                        if (!Ext.isEmpty(config.writeFields)) {
+                            record.setWriteFields(config.writeFields);
+                        }
+
+                        // Update view model with the loaded record
                         this.set(name, record);
                     },
                     scope: this

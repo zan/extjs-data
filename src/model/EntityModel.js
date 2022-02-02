@@ -52,6 +52,9 @@ Ext.define('Zan.data.model.EntityModel', {
         // Associations currently being tracked for changes
         this._trackedAssociations = {};
 
+        // A list of additional field paths to write to the server when save() is called
+        this._writeFields = [];
+
         this.callParent(arguments);
     },
 
@@ -174,6 +177,21 @@ Ext.define('Zan.data.model.EntityModel', {
         return deferred.promise;
     },
 
+    getWriteFields: function() {
+        return this._writeFields;
+    },
+
+    setWriteFields: function(fieldPaths) {
+        // Find any associations that are stores and track them so we can correctly flag ourselves as dirty
+        Ext.Object.each(this.associations, function(key, association, obj) {
+            Ext.Array.forEach(fieldPaths, function(fieldPath) {
+                if (key === fieldPath) this.trackDirtyAssociations([fieldPath]);
+            }, this);
+        }, this);
+
+        this._writeFields = fieldPaths;
+    },
+
     inheritableStatics: {
         /**
          * OVERRIDDEN to provide support for loading by string-based identifiers
@@ -220,6 +238,7 @@ Ext.define('Zan.data.model.EntityModel', {
      *      record.zanGet('requester'); // returns User model from "requester" association
      *
      * todo: better name would be 'resolve'? leave as 'zan' to indicate it's not a native Ext method?
+     * todo: remove this, moved to Zan.data.util.ModelUtil.getValue
      * @param fieldName
      * @returns {*}
      */
