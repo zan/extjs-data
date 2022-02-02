@@ -1,108 +1,111 @@
 Ext.define('Zan.data.button.SaveButtonController', {
     extend: 'Ext.app.ViewController',
 
-    init: function() {
-        // todo: docs
-        this._trackedRecords = [];
-        this._dirtyRecords = [];
+    requires: [
+        'Zan.data.util.ModelUtil',
+        'Zan.data.util.StoreUtil',
+    ],
+
+    constructor: function(config) {
+        this.callParent([config]);
+
+        this._trackedItems = new Ext.util.MixedCollection();
+
+        // Models don't support events, so we need to poll them to see if they are dirty
+        this._dirtyRecordPoller = new Ext.util.TaskRunner();
     },
 
     afterRender: function() {
-        // Models don't support events, so we need to poll them to see if they are dirty
-        this._runner = new Ext.util.TaskRunner();
-        this._runner.start({
-            run: function() {
-                for (var i=0; i < this._trackedRecords.length; i++) {
-                    var record = this._trackedRecords[i];
+        this._initDirtyRecordPoller();
+    },
 
-                    // todo: move isAnyAssociationDirty out of the model (for performance reasons) and see if we can do everything here
-                    if (record.isDirty() || record.isAnyAssociationDirty()) {
-                        this.markAsDirty();
-                        this._addDirtyRecord(record);
-                    }
-                }
+    destroy: function() {
+        // Clean up task runner that polls for changes
+        this._dirtyRecordPoller.destroy();
+
+        // Remove any store listeners
+        this.clearTrackedItems();
+
+        this.callParent(arguments);
+    },
+
+    clearTrackedItems: function() {
+        this._trackedItems.each(function(item) {
+            this._untrackItem(item);
+        }, this);
+    },
+
+    trackItem: function(modelOrStore) {
+        // Early exit if we're already tracking it
+        if (this._trackedItems.contains(modelOrStore)) return;
+
+        if (modelOrStore instanceof Ext.data.Model) {
+            // Note: records do not support on dirty events, instead they must be polled
+            // See _initDirtyRecordPoller
+        }
+        if (modelOrStore instanceof Ext.data.Store) {
+            // NOTE: cannot be an anonymous function because we need to remove it in clearTrackedItems
+            modelOrStore.on('datachanged', this._onStoreDataChanged, this);
+        }
+
+        // todo: check if already tracked
+        this._trackedItems.add(modelOrStore);
+    },
+
+    untrackItem: function(modelOrStore) {
+        if (modelOrStore instanceof Ext.data.Store) {
+            // Remove datachanged listener
+            modelOrStore.un('datachanged', this._onStoreDataChanged, this);
+        }
+
+        this._trackedItems.remove(modelOrStore);
+    },
+
+    commitChanges: async function() {
+        // todo: better error checking
+
+        this._trackedItems.each(async function(recordOrStore) {
+            if (recordOrStore instanceof Ext.data.Store) {
+                // Wait until the store has synced and then clear the dirty flag
+                // Note that this requires a 'delay' because datachanged seems to be fire multiple times
+                // and it's not possible to ensure this is called last
+                recordOrStore.on('datachanged', function() {
+                    this._clearDirty();
+                }, this, { single: true, delay: 50 });
+                await Zan.data.util.StoreUtil.sync(recordOrStore);
+            }
+            if (recordOrStore instanceof Ext.data.Model && recordOrStore.isDirty()) {
+                await Zan.data.util.ModelUtil.save(recordOrStore);
+            }
+        }, this);
+
+        this._clearDirty();
+    },
+
+    _initDirtyRecordPoller: function() {
+        this._dirtyRecordPoller.start({
+            run: function() {
+                this._trackedItems.each(function(item) {
+                    // Ignore if it's a store since they can be tracked via listeners
+                    if (item instanceof Ext.data.Store) return true;
+
+                    if (item.isDirty()) this._markAsDirty();
+                }, this);
             },
             scope: this,
             interval: 500,
         });
     },
 
-    destroy: function() {
-        // Clean up task runner that polls for changes
-        this._runner.destroy();
-
-        this.callParent(arguments);
-    },
-
-    updateTrackedRecord: function(primaryRecord) {
-        var view = this.getView();
-        this._trackDirtyAssociations = view.getTrackDirtyAssociations();
-
-        // Ensure record is tracking these associations
-        if (this._trackDirtyAssociations.length > 0) {
-            primaryRecord.trackDirtyAssociations(this._trackDirtyAssociations);
-        }
-
-        this._trackedRecords = [];
-        // Always track the original record's dirty state
-        if (primaryRecord) {
-            this._trackedRecords.push(primaryRecord);
-
-            // Process additional fields to see how to trakc them
-            Ext.Array.forEach(this._trackDirtyAssociations, function(subFieldName) {
-                var field = primaryRecord.zanGet(subFieldName);
-                if (field instanceof Ext.data.Model) {
-                    this._trackedRecords.push(field);
-                }
-                if (field instanceof Ext.data.Store) {
-                    field.on('datachanged', function() {
-                        this.getViewModel().set('isDirty', true);
-                    }, this);
-                }
-            }, this);
-        }
-    },
-
-    commitChanges: async function() {
-        // todo: more features around firing events when saving starts and finishes to UIs can properly mask themselves
-        // todo: this should save items serially
-
-        if (this.getStore()) {
-            throw new Error("todo: implement store saving including promisedSync");
-        }
-
-        // Commit any models with changes
-        for (var i=0; i < this._dirtyRecords.length; i++) {
-            var dirtyRecord = this._dirtyRecords[i];
-            await dirtyRecord.promisedSave();
-        }
-
-        this._dirtyRecords = [];
-        this.clearDirty();
-
-        var successHandler = this.getView().getSuccessHandler();
-        if (successHandler) {
-            successHandler.call(this.getView().getScope(), this.getView());
-        }
-    },
-
-    markAsDirty: function() {
+    _onStoreDataChanged: function(store) {
         this.getViewModel().set('isDirty', true);
     },
 
-    clearDirty: function() {
-        this.getViewModel().set('isDirty', false);
+    _markAsDirty: function() {
+        this.getViewModel().set('isDirty', true);
     },
 
-    _addDirtyRecord: function(newRecord) {
-        // Ensure it's not already added
-        for (var i=0; i < this._dirtyRecords.length; i++) {
-            var curr = this._dirtyRecords[i];
-            // todo: should be a library method for this
-            // Record is already known
-            if (curr.getId() === newRecord.getId() && curr.$className === newRecord.$className) return;
-        }
-
-        this._dirtyRecords.push(newRecord);
+    _clearDirty: function() {
+        this.getViewModel().set('isDirty', false);
     },
 });

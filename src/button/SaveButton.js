@@ -16,7 +16,7 @@ Ext.define('Zan.data.button.SaveButton', {
         successHandler: null,
         scope: null,
 
-        trackDirtyAssociations: [],
+        trackedItems: [],
     },
 
     controller: { xclass: 'Zan.data.button.SaveButtonController' },
@@ -42,24 +42,36 @@ Ext.define('Zan.data.button.SaveButton', {
     },
 
     applyStore: function(newStore) {
-        // Remove listener from previous store, if any
+        // Stop tracking previous store, if any
         if (this.getStore()) {
-            this.getStore().un('datachanged', this._onStoreDataChanged, this);
+            this.getController().untrackItem(this.getStore());
         }
 
         return newStore;
     },
 
     updateStore: function(store) {
-        // NOTE: cannot be an anonymous function because we need to remove it in applyStore
-        store.on('datachanged', this._onStoreDataChanged, this);
+        this.getController().trackItem(store);
+    },
+
+    applyRecord: function(newRecord) {
+        // Stop tracking previous store, if any
+        if (this.getRecord()) {
+            this.getController().untrackItem(this.getRecord());
+        }
+
+        return newRecord;
     },
 
     updateRecord: function(record) {
-        this.getController().updateTrackedRecord(record);
+        this.getController().trackItem(record);
     },
 
-    _onStoreDataChanged: function(store) {
-        this.getViewModel().set('isDirty', true);
+    updateTrackedItems: function(items) {
+        this.getController().clearTrackedItems();
+
+        Ext.Array.forEach(items, function(item) {
+            this.getController().trackItem(item);
+        }, this);
     },
 });
