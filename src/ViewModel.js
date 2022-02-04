@@ -55,7 +55,10 @@ Ext.define('Zan.data.ViewModel', {
             }
 
             // Load the model with the known parameters
-            Ext.ClassManager.get(config.type).load(
+            var modelPrototype = Ext.ClassManager.get(config.type);
+            if (!modelPrototype) throw new Error("Invalid model class: " + config.type);
+
+            modelPrototype.load(
                 null,
                 {
                     params: params,
