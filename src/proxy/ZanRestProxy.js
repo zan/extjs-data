@@ -12,6 +12,7 @@ Ext.define('Zan.data.proxy.ZanRestProxy', {
 
     // disable the "_dc" cache busting parameter by default since requests will almost always have a query string anyway
     noCache: false,
+    batchActions: true,
 
     reader: {
         type: 'zan-entity',
