@@ -28,7 +28,17 @@ Ext.define('Zan.data.util.ModelUtil', {
             };
         }
 
-        // todo: reject on failure
+        // Replace 'failure' function with ours, if one was specified
+        // todo: remove interceptAfter above and use this simpler method
+        var originalFailureFn = Ext.emptyFn;
+        if (options.failure) {
+            originalFailureFn = options.failure;
+        }
+        options.failure = function(record, operation) {
+            originalFailureFn.call(options.scope, record, operation);
+            // todo: better rejection exception (requires server returning a json response)
+            deferred.reject("Server error, see network request for more details");
+        };
 
         record.save(options);
 
