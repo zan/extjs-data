@@ -15,6 +15,14 @@ Ext.define('Zan.data.util.ModelUtil', {
         options = options || {};
         var deferred = new Ext.Deferred();
 
+        // Indicate on the model that additional fields are being written
+        // This must be stored on the model because EntityWriter will need to access it
+        var savedWriteFields = null;
+        if (options.writeFields) {
+            savedWriteFields = record.getWriteFields();
+            record.setWriteFields(options.writeFields);
+        }
+
         // Hook into the existing success handler if one was specified
         if (options.success) {
             Ext.Function.interceptAfter(options, 'success', function(record, operation) {
@@ -38,6 +46,18 @@ Ext.define('Zan.data.util.ModelUtil', {
             originalFailureFn.call(options.scope, record, operation);
             // todo: better rejection exception (requires server returning a json response)
             deferred.reject("Server error, see network request for more details");
+        };
+
+        var originalCallbackFn = Ext.emptyFn;
+        if (options.callback) {
+            originalCallbackFn = options.callback;
+        }
+        options.callback = function(record, operation, wasSuccessful) {
+            // Restore original writeFields
+            if (options.writeFields) record.setWriteFields(savedWriteFields);
+
+            // Call original callback
+            originalCallbackFn.call(options.scope, record, operation, wasSuccessful);
         };
 
         record.save(options);
