@@ -29,11 +29,11 @@ Ext.define('Zan.data.writer.EntityWriter', {
 
         // todo: writefields triggers additional http GET (??) requests on save when this is enabled
         //  to reproduce, on the user edit page, add write fields userDepartmentMappings, userDepartmentMappings.user, userDepartmentMappings.department
-        // var writeFields = record.getWriteFields();
-        //
-        // Ext.Array.forEach(writeFields, function(item) {
-        //     this._resolveFieldValueAndStore(record, item, recordData);
-        // }, this);
+        var writeFields = record.getWriteFields();
+
+        Ext.Array.forEach(writeFields, function(item) {
+            this._resolveFieldValueAndStore(record, item, recordData);
+        }, this);
 
         // todo: is this feature actually necessary? was originally added to work around 'role' name conflict, but that
         //  was resolved by renaming the associationRole to 'permissionsRole'
