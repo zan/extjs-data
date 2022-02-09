@@ -1,3 +1,16 @@
+/**
+ * Example:
+        {
+            xtype: 'zan-entitycombo',
+            fieldLabel: 'Example Field',
+            store: {
+                type: 'zan-entitystore',
+                model: 'App.model.ExampleFieldModel',
+            },
+        },
+
+ * todo: why is autoLoad necessary?
+ */
 Ext.define('Zan.data.form.field.EntityCombo', {
     extend: 'Ext.form.field.ComboBox',
 
