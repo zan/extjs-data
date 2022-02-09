@@ -50,7 +50,8 @@ Ext.define('Zan.data.Api', {
                 responseInfo.requestSuccessful = false;
                 debugRestRequest.set('isError', true);
 
-                deferred.resolve(responseInfo);
+                // todo: return json error response from the server
+                deferred.reject("Check the network tab for more details");
             },
 
             callback: function(options, wasSuccessful, response) {
