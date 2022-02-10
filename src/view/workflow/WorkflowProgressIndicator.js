@@ -24,12 +24,13 @@ Ext.define('Zan.data.view.workflow.WorkflowProgressIndicator', {
 
         var items = [];
         Ext.Array.forEach(workflow.get('places'), function(item) {
+            var placeLabel = Zan.common.util.Format.snakeCaseToTitleCase(item.name);
             var isInThisState = workflow.get('marking') === item.name;
 
             // Check hideFromProgress unless we're in the state
             if (!isInThisState && item.hideFromProgress) return true;
 
-            var html = item.name;
+            var html = placeLabel;
             if (isInThisState) {
                 html = '<b>' + html + '</b>';
             }
