@@ -32,8 +32,12 @@ Ext.define('Zan.data.form.field.EntityCombo', {
     displayField: 'label',
     valueField: 'id',
 
-    // User must pick a valid record, if false users are able to enter string values
-    forceSelection: true,
+    // NOTE: This must be false even though we want users to choose valid records
+    // If this is true, calling setValue() with a record that does not exist in the store will cause the value to get cleared
+    // This is a problem when working with historical data that may have inactive selections that are not visible
+    // in the API response but are still valid values that shouldn't be overwritten with 'null'
+    // todo: how to handle this validation to ensure a valid record is selected before posting to the API?
+    forceSelection: false,
 
     queryMode: 'remote',
     pageSize: 100,
