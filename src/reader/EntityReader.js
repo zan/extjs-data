@@ -27,6 +27,15 @@ Ext.define('Zan.data.reader.EntityReader', {
                 // For example:
                 //rawData.data._editableFields = { requestedBy: true };
                 rawData.data._editableFields = this._calculateFieldEditability(rawData.data, rawData.metadata.fieldEditability);
+                var isAnyFieldEditable = false;
+                Ext.Object.each(rawData.data._editableFields, function(propertyName, isEditable) {
+                    if (isEditable) {
+                        isAnyFieldEditable = true;
+                        return false; // break
+                    }
+                });
+                rawData.data._isAnyFieldEditable = isAnyFieldEditable;
+                rawData.data._allFieldsReadOnly = !isAnyFieldEditable;
             }
         }
 
