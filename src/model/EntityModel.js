@@ -37,7 +37,10 @@ Ext.define('Zan.data.model.EntityModel', {
         // If true, this record can be edited. See Zan.data.reader.EntityReader for where this is calculated
         // todo: should this really be a field? can it be an object property?
         { name: '_isEditable', type: 'bool', allowNull: true, persist: false, },
+        { name: '_isAnyFieldEditable', type: 'bool', allowNull: true, persist: false, },
+        { name: '_allFieldsReadOnly', type: 'bool', allowNull: true, persist: false, },
         { name: '_editableFields', type: 'auto', default: {}, persist: false },
+
         { name: 'workflow', type: 'zan-association',
             reference: {
                 type: 'Zan.data.model.WorkflowModel',
