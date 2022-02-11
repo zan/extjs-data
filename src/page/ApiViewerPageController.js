@@ -1,10 +1,8 @@
 Ext.define('Zan.data.page.ApiViewerPageController', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.zan-data-ApiViewerPageController',
 
     requires: [
-        // todo: sencha app build fails if this is required from here
-        //'Zan.data.Api',
+        'Zan.data.Api',
     ],
 
     async onDoRequest() {
@@ -25,7 +23,15 @@ Ext.define('Zan.data.page.ApiViewerPageController', {
         doRequestButton.setText('Requesting...');
         doRequestButton.disable();
 
-        var result = await Zan.data.Api.makeRequest(url, formValues.method, postData);
+        var result = null;
+        try {
+            result = await Zan.data.Api.makeRequest(url, formValues.method, postData);
+        } catch (ex) {
+            console.log("Exception :O");
+            console.log(ex);
+            console.log("raw response: %o", ex.getResponseInfo());
+            result = ex.getResponseInfo();
+        }
 
         doRequestButton.setText(oldText);
         doRequestButton.enable();
@@ -42,6 +48,7 @@ Ext.define('Zan.data.page.ApiViewerPageController', {
             console.log("Set debugLastResponse to %o", result.responseData);
         }
 
-        this.lookupReference('responsePanel').setHtml(responseHtml);
+        //this.lookupReference('responsePanel').setHtml(responseHtml);
+        this.lookupReference('responsePanel').loadResponseInfo(result);
     },
 });

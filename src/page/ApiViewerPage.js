@@ -4,6 +4,7 @@ Ext.define('Zan.data.page.ApiViewerPage', {
     requires: [
         'Zan.data.page.ApiViewerPageController',
         'Zan.data.view.panel.IframePanel',
+        'Zan.data.page.apiViewer.ApiResponsePanel',
     ],
 
     controller: { xclass: 'Zan.data.page.ApiViewerPageController' },
@@ -87,10 +88,9 @@ Ext.define('Zan.data.page.ApiViewerPage', {
             flex: 1,
             items: [
                 {
-                    xtype: 'panel',
+                    xclass: 'Zan.data.page.apiViewer.ApiResponsePanel',
                     title: 'Response',
                     reference: 'responsePanel',
-                    autoScroll: true,
                 },
                 {
                     xtype: 'zan-iframe',
