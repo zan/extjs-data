@@ -9,7 +9,7 @@ Ext.define('Zan.data.button.SaveButtonController', {
     constructor: function(config) {
         this.callParent([config]);
 
-        this._trackedItems = new Ext.util.MixedCollection();
+        this._trackedItems = [];
 
         // Models don't support events, so we need to poll them to see if they are dirty
         this._dirtyRecordPoller = new Ext.util.TaskRunner();
@@ -30,14 +30,22 @@ Ext.define('Zan.data.button.SaveButtonController', {
     },
 
     clearTrackedItems: function() {
-        this._trackedItems.each(function(item) {
-            this.untrackItem(item);
-        }, this);
+        while (this._trackedItems.length > 0) {
+            this.untrackItem(this._trackedItems[0]);
+        }
+    },
+
+    hasTrackedItem: function(item) {
+        for (var i=0; i < this._trackedItems.length; i++) {
+            if (item === this._trackedItems[i]) return true;
+        }
+
+        return false;
     },
 
     trackItem: function(modelOrStore) {
         // Early exit if we're already tracking it
-        if (this._trackedItems.contains(modelOrStore)) return;
+        if (this.hasTrackedItem(modelOrStore)) return true;
 
         if (modelOrStore instanceof Ext.data.Model) {
             // Note: records do not support on dirty events, instead they must be polled
@@ -48,8 +56,7 @@ Ext.define('Zan.data.button.SaveButtonController', {
             modelOrStore.on('datachanged', this._onStoreDataChanged, this);
         }
 
-        // todo: check if already tracked
-        this._trackedItems.add(modelOrStore);
+        this._trackedItems.push(modelOrStore);
     },
 
     untrackItem: function(modelOrStore) {
@@ -58,13 +65,16 @@ Ext.define('Zan.data.button.SaveButtonController', {
             modelOrStore.un('datachanged', this._onStoreDataChanged, this);
         }
 
-        this._trackedItems.remove(modelOrStore);
+        var itemIdx = this._trackedItems.indexOf(modelOrStore);
+        if (itemIdx === -1) return; // Not in the array for some reason
+
+        this._trackedItems.splice(itemIdx, 1)
     },
 
     commitChanges: async function() {
         // todo: better error checking
 
-        this._trackedItems.each(async function(recordOrStore) {
+        this._trackedItems.forEach(async function(recordOrStore) {
             if (recordOrStore instanceof Ext.data.Store) {
                 // Wait until the store has synced and then clear the dirty flag
                 // Note that this requires a 'delay' because datachanged seems to be fire multiple times
@@ -85,7 +95,7 @@ Ext.define('Zan.data.button.SaveButtonController', {
     _initDirtyRecordPoller: function() {
         this._dirtyRecordPoller.start({
             run: function() {
-                this._trackedItems.each(function(item) {
+                this._trackedItems.forEach(function(item) {
                     // Ignore if it's a store since they can be tracked via listeners
                     if (item instanceof Ext.data.Store) return true;
 
@@ -93,7 +103,7 @@ Ext.define('Zan.data.button.SaveButtonController', {
                 }, this);
             },
             scope: this,
-            interval: 500,
+            interval: 100,
         });
     },
 
