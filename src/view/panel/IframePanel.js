@@ -13,7 +13,9 @@ Ext.define('Zan.data.view.panel.IframePanel', {
 
     loadMask: 'Loading...',
 
-    src: 'about:blank',
+    config: {
+        src: 'about:blank',
+    },
 
     renderTpl: [
         // eslint-disable-next-line max-len
@@ -125,6 +127,10 @@ Ext.define('Zan.data.view.panel.IframePanel', {
 
             frame.src = me.src = (src || me.src);
         }
+    },
+
+    updateSrc: function(value) {
+        this.load(value);
     },
 });
 
