@@ -36,6 +36,9 @@ Ext.define('Zan.data.page.ApiViewerPageController', {
         doRequestButton.setText(oldText);
         doRequestButton.enable();
 
+        // Update URL with most recent successful request
+        this._syncUrl();
+
         if (result.sfProfilerUrl) {
             this.lookupReference('sfProfilerIframe').load(result.sfProfilerUrl);
         }
@@ -51,4 +54,14 @@ Ext.define('Zan.data.page.ApiViewerPageController', {
         //this.lookupReference('responsePanel').setHtml(responseHtml);
         this.lookupReference('responsePanel').loadResponseInfo(result);
     },
+
+    _syncUrl: function() {
+        var formValues = this.lookupReference('form').getValues();
+        var currUrl = location.hash;
+
+        var newUrl = Zan.common.Url.setUrlVar(currUrl, 'requestUrl', formValues.url);
+        newUrl = Zan.common.Url.setUrlVar(newUrl, 'requestMethod', formValues.method);
+
+        Zan.common.Url.setBrowserUrl(newUrl);
+    }
 });
