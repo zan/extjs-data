@@ -13,6 +13,12 @@ Ext.define('Zan.data.button.SaveButton', {
 
         successToastMessage: 'Data Saved',
 
+        /**
+         * @cfg {function} Called when all saves have completed
+         *
+         * Arguments:
+         *  - saveButton
+         */
         successHandler: null,
         scope: null,
 

@@ -90,6 +90,11 @@ Ext.define('Zan.data.button.SaveButtonController', {
         }, this);
 
         this._clearDirty();
+
+        var successHandler = this.getView().getSuccessHandler();
+        if (Ext.isFunction(successHandler)) {
+            successHandler.call(this.getView().getScope(), this.getView());
+        }
     },
 
     _initDirtyRecordPoller: function() {
