@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JSON Viewr Template</title>
+
+  <script src="json-viewer.js"></script>
+  <link rel="stylesheet" type="text/css" href="json-viewer.css">
+</head>
+<body>
+  <div id="json"></div>
+  <script>
+    var jsonViewer = new JSONViewer();
+    document.querySelector("#json").appendChild(jsonViewer.getContainer());
+  </script>
+</body>
+</html>

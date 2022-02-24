@@ -4,16 +4,45 @@
 Ext.define('Zan.data.page.apiViewer.ApiResponsePanel', {
     extend: 'Ext.panel.Panel',
 
+    requires: [
+        'Zan.data.panel.JsonViewPanel',
+    ],
+
     viewModel: {},
+    layout: {
+        type: 'vbox',
+        align: 'stretch',
+    },
    
     items: [
         {
             xtype: 'panel',
-            itemId: 'htmlPanel',
+            flex: 1,
+            layout: { type: 'vbox', align: 'stretch' },
             bind: {
                 hidden: '{!responseInfo.requestSuccessful}',
             },
-            autoScroll: true,
+            tbar: [
+                {
+                    iconCls: 'x-fa fa-compress-alt',
+                    handler: function(button) {
+                        button.up('panel').down('#jsonPanel').showLess();
+                    }
+                },
+                {
+                    iconCls: 'x-fa fa-expand-alt',
+                    handler: function(button) {
+                        button.up('panel').down('#jsonPanel').showMore();
+                    }
+                },
+            ],
+            items: [
+                {
+                    xclass: 'Zan.data.panel.JsonViewPanel',
+                    itemId: 'jsonPanel',
+                    flex: 1,
+                },
+            ]
         },
         {
             xtype: 'panel',
@@ -38,8 +67,7 @@ Ext.define('Zan.data.page.apiViewer.ApiResponsePanel', {
         this.getViewModel().set('responseInfo', responseInfo);
 
         if (responseInfo.requestSuccessful) {
-            var responseHtml = '<code style="margin: 4px;">' + Ext.util.Format.htmlEncode(JSON.stringify(responseInfo.responseData)) + '</code>';
-            this.down('#htmlPanel').setHtml(responseHtml);
+            this.down('#jsonPanel').loadJson(responseInfo.responseData);
         }
         else {
             this.down("#errorPanel").setHtml(this._buildTroubleshootingHtml(responseInfo));
