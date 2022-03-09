@@ -1,4 +1,4 @@
-Ext.define('Zan.data.view.workflow.WorkflowButtonToolbarController', {
+Ext.define('Zan.data.workflow.WorkflowButtonToolbarController', {
     extend: 'Ext.app.ViewController',
 
     init: function() {

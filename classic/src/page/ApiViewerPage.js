@@ -3,7 +3,7 @@ Ext.define('Zan.data.page.ApiViewerPage', {
 
     requires: [
         'Zan.data.page.ApiViewerPageController',
-        'Zan.data.view.panel.IframePanel',
+        'Zan.data.panel.IframePanel',
         'Zan.data.page.apiViewer.ApiResponsePanel',
     ],
 

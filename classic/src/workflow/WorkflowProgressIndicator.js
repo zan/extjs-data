@@ -1,4 +1,4 @@
-Ext.define('Zan.data.view.workflow.WorkflowProgressIndicator', {
+Ext.define('Zan.data.workflow.WorkflowProgressIndicator', {
     extend: 'Ext.panel.Panel',
 
     requires: [

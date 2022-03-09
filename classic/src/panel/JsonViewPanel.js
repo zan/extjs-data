@@ -1,5 +1,5 @@
 Ext.define('Zan.data.panel.JsonViewPanel', {
-    extend: 'Zan.data.view.panel.IframePanel',
+    extend: 'Zan.data.panel.IframePanel',
 
     requires: [
         'Zan.common.Object',
