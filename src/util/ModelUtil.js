@@ -131,6 +131,35 @@ Ext.define('Zan.data.util.ModelUtil', {
         }
     },
 
+    /**
+     * Association-aware setter for a record
+     *
+     * If fieldOrAssociation is a normal field defined on the record this will do record.set('exampleField', value)
+     *
+     * If fieldOrAssociation is an association it will use the setter, eg. record.setExampleField(value)
+     *
+     * @param record
+     * @param fieldOrAssociation
+     * @param value
+     * @returns {*}
+     */
+    setValue: function(record, fieldOrAssociation, value) {
+        if (this.isAssociation(record, fieldOrAssociation)) {
+            var field = record.getField(fieldOrAssociation);
+            return record[field.reference.setterName](value);
+        }
+        else {
+            return record.set(fieldOrAssociation, value);
+        }
+    },
+
+    /**
+     * Returns true if fieldName is an association (oneToX or manyToX)
+     */
+    isAssociation: function(record, fieldName) {
+        return !!record.associations[fieldName];
+    },
+
     _resolveEntityValue: function(value) {
         if (value instanceof Ext.data.Model) {
             return value.getId();

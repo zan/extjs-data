@@ -273,6 +273,7 @@ Ext.define('Zan.data.model.EntityModel', {
         }
     },
 
+    // todo: remove, replaced by Zan.data.util.ModelUtil.setValue
     zanSet(fieldName, value) {
         const field = this.getField(fieldName);
         if (!field) return null;
