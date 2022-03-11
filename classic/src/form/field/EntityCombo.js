@@ -63,6 +63,15 @@ Ext.define('Zan.data.form.field.EntityCombo', {
         this.on('change', this._onChange, this);
     },
 
+    /**
+     * Returns a record representing the value of this combo box
+     *
+     * @returns {Ext.data.Model}
+     */
+    getValueRecord: function() {
+        return this.findRecordByValue(this.getValue());
+    },
+
     updateZanValueRecord: function(record) {
         if (!this.getName()) {
             throw new Error("This field must have a 'name' set to use zanValueRecord");
