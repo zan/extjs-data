@@ -46,6 +46,6 @@ Ext.define('Zan.data.form.field.Display', {
     renderer: function(value) {
         if (value === null || value === undefined) return this.getNullValueText();
 
-        return Ext.String.htmlEncode(Zan.common.String.from(value, this.getStringConversionOptions()));
+        return Zan.common.String.htmlEncode(Zan.common.String.from(value, this.getStringConversionOptions()));
     },
 });
