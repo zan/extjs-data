@@ -42,7 +42,6 @@ Ext.define('Zan.data.form.RecordFormMixin', {
             // Skip if the field is not an association
             if (!Zan.data.util.ModelUtil.isAssociation(record, field.getName())) return true; // continue
 
-            console.log("Need to copy %o back to %o", field.getValueRecord(), field.getName());
             Zan.data.util.ModelUtil.setValue(record, field.getName(), field.getValueRecord());
         });
     },
