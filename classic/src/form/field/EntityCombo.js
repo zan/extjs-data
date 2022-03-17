@@ -9,7 +9,10 @@
             },
         },
 
- * todo: why is autoLoad necessary?
+ *
+ * ### Note on loading data
+ *
+ * The default behavior of the combo box is to delay loading data until the combo box is first expanded
  */
 Ext.define('Zan.data.form.field.EntityCombo', {
     extend: 'Ext.form.field.ComboBox',
@@ -40,8 +43,9 @@ Ext.define('Zan.data.form.field.EntityCombo', {
     forceSelection: false,
 
     queryMode: 'remote',
+    lastQuery: '',          // Prevents combo box from loading twice when store autoLoad is used (expanding sends an empty query so Ext thinks it has changed)
     pageSize: 100,
-    minChars: 3,             // Number of characters required before remote query is performed
+    minChars: 3,            // Number of characters required before remote query is performed
 
     // todo: necessary?
     autoLoadOnValue: true,
@@ -55,6 +59,16 @@ Ext.define('Zan.data.form.field.EntityCombo', {
             cls: 'x-form-clear-trigger',
             handler: Ext.form.field.ComboBox.prototype.clearValue,
         }
+    },
+
+    listeners: {
+        // Load the store the first time the combo box is expanded
+        expand: {
+            fn: function(combo, opts) {
+                combo.getStore().load();
+            },
+            single: true,
+        },
     },
 
     initComponent: function() {
