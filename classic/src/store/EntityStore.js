@@ -60,13 +60,18 @@ Ext.define('Zan.data.store.EntityStore', {
 
     load: function(options) {
         options = options || {};
+        options.params = options.params || {};
+        options.params.includeMetadata = options.params.includeMetadata || [];
 
         // pass 'responseFields' in params when parent store loads
-        if (this.getResponseFields() && Ext.isObject(options)) {
-            options.params = options.params || {};
+        if (this.getResponseFields()) {
             options.params = Ext.apply(options.params, {
                 responseFields: this.getResponseFields()
             });
+        }
+
+        if (this.getIncludeEditabilityMetadata()) {
+            options.params.includeMetadata.push('editability');
         }
 
         return this.callParent([ options ]);
