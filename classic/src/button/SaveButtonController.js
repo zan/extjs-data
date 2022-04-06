@@ -95,6 +95,15 @@ Ext.define('Zan.data.button.SaveButtonController', {
         if (Ext.isFunction(successHandler)) {
             successHandler.call(this.getView().getScope(), this.getView());
         }
+
+        var successToastMessage = this.getView().getSuccessToastMessage();
+        if (successToastMessage) {
+            Ext.toast(successToastMessage);
+        }
+
+        if (this.getView().getGoBackAfterSave()) {
+            history.go(-1);
+        }
     },
 
     _initDirtyRecordPoller: function() {
