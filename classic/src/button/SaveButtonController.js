@@ -74,7 +74,9 @@ Ext.define('Zan.data.button.SaveButtonController', {
     commitChanges: async function() {
         // todo: better error checking
 
-        this._trackedItems.forEach(async function(recordOrStore) {
+        for (var i=0; i < this._trackedItems.length; i++) {
+            var recordOrStore = this._trackedItems[i];
+
             if (recordOrStore instanceof Ext.data.Store) {
                 // Wait until the store has synced and then clear the dirty flag
                 // Note that this requires a 'delay' because datachanged seems to be fire multiple times
@@ -87,7 +89,7 @@ Ext.define('Zan.data.button.SaveButtonController', {
             if (recordOrStore instanceof Ext.data.Model && recordOrStore.isDirty()) {
                 await Zan.data.util.ModelUtil.save(recordOrStore);
             }
-        }, this);
+        }
 
         this._clearDirty();
 
