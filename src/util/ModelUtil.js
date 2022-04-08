@@ -5,6 +5,37 @@ Ext.define('Zan.data.util.ModelUtil', {
     singleton: true,
 
     /**
+     * Calls record.load() and returns a promise
+     *
+     * @param {Ext.data.Model} record
+     * @param {object} options
+     * @returns {Promise<any>|Ext.promise}
+     */
+    load: function(record, options) {
+        options = options || {};
+        var deferred = new Ext.Deferred();
+
+        // Normalize success and failure functions so that we can always use interceptAfter
+        Ext.applyIf(options, {
+            success: function() {},
+            failure: function() {},
+        });
+
+        Ext.Function.interceptAfter(options, 'success', function(record, operation) {
+            deferred.resolve(record);
+        });
+
+        Ext.Function.interceptAfter(options, 'failure', function(record, operation) {
+            // todo: better rejection exception (requires server returning a json response)
+            deferred.reject("Server indicated request was unsuccessful, see network tab for more details");
+        });
+
+        record.load(options);
+
+        return deferred.promise;
+    },
+
+    /**
      * Calls record.save() and returns a promise
      *
      * @param {Ext.data.Model} record
