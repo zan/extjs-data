@@ -54,22 +54,11 @@ Ext.define('Zan.data.proxy.ZanRestProxy', {
         var requestLogStore = Ext.data.StoreManager.get('Zan.data.DebugRequestLogStore');
 
         if (requestLogStore) {
-            var url = request.getUrl();
-            // URL does not include query parameters for GET requests, add them back in
-            if ('GET' === request.getMethod() && !Ext.isEmpty(request.getParams())) {
-                var encodedParams = Ext.Object.toQueryString(request.getParams());
-                url = url + '?' + encodedParams;
-            }
-            requestLogStore.add({
-                responseAt: new Date(),
-                isError: !success,
-                method: request.getMethod(),
-                url: url,
-                parameters: JSON.stringify(request.getJsonData()),
-            });
+            requestLogStore.addFromRawRequest(request, success);
         }
 
-        if (!success) {
+        // Display a dialog for critical server errors (500 range)
+        if (!success && response.status >= 500 && response.status <= 599) {
             // Raw URL without parameters: request.getRawRequest().requestOptions.url
             var requestUrl = request.getRawRequest().requestOptions.url;
             var requestDebugLink = '#/zan/data/api-viewer?';
