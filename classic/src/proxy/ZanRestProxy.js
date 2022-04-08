@@ -1,6 +1,11 @@
 /**
  * todo: this should be split into a rest proxy with API debugging integration and an EntityRestProxy that incorporates
  * the default readers
+ *
+ * ### Features
+ *
+ * Allows sending complex parameters in 'params' key for GET requests.
+ * These are json-encoded before being sent with the request. See sendRequest()
  */
 Ext.define('Zan.data.proxy.ZanRestProxy', {
     extend: 'Ext.data.proxy.Rest',
@@ -20,6 +25,29 @@ Ext.define('Zan.data.proxy.ZanRestProxy', {
 
     writer: {
         type: 'zan-entity',
+    },
+
+    sendRequest: function(request) {
+        // Convert parameters with object data into a json-encoded representation
+        // This only applies for "GET" requests
+        if ('GET' === this.getMethod(request).toUpperCase()) {
+            var params = request.getParams();
+            var encodedParams = {};
+
+            Ext.Object.each(params, function(key, value) {
+                // Only non-scalar values need to be encoded
+                if (Ext.isArray(value) || Ext.isObject(value)) {
+                    encodedParams[key] = JSON.stringify(value);
+                }
+                else {
+                    encodedParams[key] = value;
+                }
+            });
+
+            request.setParams(encodedParams);
+        }
+
+        return this.callParent([ request ]);
     },
 
     processResponse(success, operation, request, response) {
