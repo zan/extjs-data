@@ -35,12 +35,22 @@ Ext.define('Zan.data.panel.IframePanel', {
      * See load() for more details
      */
     afterRender() {
+        var me = this;
         this.callParent(arguments);
 
         if (this._pendingLoadSrc) {
             this.load(this._pendingLoadSrc);
             this._pendingLoadSrc = null;
         }
+         if (this._pendingInnerHtml) {
+             console.log("applying delayed html content: %o", this._pendingInnerHtml);
+             // This needs a slight delay because doc element might not be initialized?
+             // todo: not sure what's going on, chrome briefly flickers the right value and then goes back to blank
+             setTimeout(function() {
+                 me.setHtmlContent(me._pendingInnerHtml);
+                 me._pendingInnerHtml = null;
+             }, 100);
+         }
     },
 
     initEvents: function() {
@@ -55,6 +65,19 @@ Ext.define('Zan.data.panel.IframePanel', {
             src: this.src,
             frameName: this.frameName
         });
+    },
+
+    /**
+     * Sets the HTML that should be displayed in the iframe
+     */
+    setHtmlContent: function(html) {
+        if (!this.rendered) {
+            // See afterRender() for where this is checked
+            this._pendingInnerHtml = html;
+            return;
+        }
+
+        this.getBody().innerHTML = html;
     },
 
     getBody: function() {
