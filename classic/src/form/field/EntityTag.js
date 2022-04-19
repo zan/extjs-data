@@ -31,8 +31,9 @@ Ext.define('Zan.data.form.field.EntityTag', {
     valueField: 'id',
 
     queryMode: 'remote',
+    lastQuery: '',          // Prevents combo box from loading twice when store autoLoad is used (expanding sends an empty query so Ext thinks it has changed)
     pageSize: 100,
-    minChars: 3,             // Number of characters required before remote query is performed
+    minChars: 3,            // Number of characters required before remote query is performed
 
     // todo: necessary?
     autoLoadOnValue: true,
@@ -46,6 +47,16 @@ Ext.define('Zan.data.form.field.EntityTag', {
             cls: 'x-form-clear-trigger',
             handler: Ext.form.field.ComboBox.prototype.clearValue,
         }
+    },
+
+    listeners: {
+        // Load the store the first time the combo box is expanded
+        expand: {
+            fn: function(combo, opts) {
+                combo.getStore().load();
+            },
+            single: true,
+        },
     },
 
     initComponent: function() {
