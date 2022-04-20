@@ -26,10 +26,15 @@ Ext.define('Zan.data.Api', {
         };
 
         // Log this request in the request store
+        var debugParams = params;
+        if ('POST' === method) {
+            debugParams = JSON.stringify(params);
+        }
+
         var debugRestRequest = Zan.data.store.DebugRequestLogStore.add({
             url: url,
             method: method,
-            parameters: params,
+            parameters: debugParams,
         })[0];
 
         var requestConfig = {
