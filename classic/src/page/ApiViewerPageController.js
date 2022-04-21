@@ -18,6 +18,10 @@ Ext.define('Zan.data.page.ApiViewerPageController', {
             postData = JSON.parse(formValues.paramsText);
         }
 
+        if (formValues.zan_enableDebugging) {
+            url = Zan.common.Url.setUrlVar(url, 'zan_enableDebugging', true);
+        }
+
         var doRequestButton = this.lookup('doRequestButton');
         var oldText = doRequestButton.getText();
         doRequestButton.setText('Requesting...');

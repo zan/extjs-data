@@ -67,6 +67,14 @@ Ext.define('Zan.data.page.ApiViewerPage', {
                     },
                 },
                 {
+                    xtype: 'checkboxfield',
+                    fieldLabel: ' ',
+                    labelSeparator: '',
+                    boxLabel: 'Enable additional debug output if available',
+                    name: 'zan_enableDebugging',
+                    inputValue: true,
+                },
+                {
                     xtype: 'fieldcontainer',
                     fieldLabel: ' ',
                     labelSeparator: '',
