@@ -64,14 +64,28 @@ Ext.define('Zan.data.page.apiViewer.ApiResponsePanel', {
     ],
 
     loadResponseInfo: function(responseInfo) {
-        this.getViewModel().set('responseInfo', responseInfo);
-
         if (responseInfo.requestSuccessful) {
-            this.down('#jsonPanel').loadJson(responseInfo.responseData);
+            // Verify that the json can be decoded since this may be a successful HTTP request containing an error
+            try {
+                if (!Ext.isObject(responseInfo.responseData)) {
+                    // throws an exception if json is invalid
+                    JSON.parse(responseInfo.responseData);
+                }
+                this.down('#jsonPanel').loadJson(responseInfo.responseData);
+            }
+            // Actually an error
+            catch (ex) {
+                console.error(ex);
+                responseInfo.requestSuccessful = false;
+                this.down("#errorPanel").setHtml(responseInfo.responseData);
+                this.down("#errorPanel").show();
+            }
         }
         else {
             this.down("#errorPanel").setHtml(this._buildTroubleshootingHtml(responseInfo));
         }
+
+        this.getViewModel().set('responseInfo', responseInfo);
     },
 
     _buildTroubleshootingHtml: function(responseInfo) {
