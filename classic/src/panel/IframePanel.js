@@ -14,7 +14,15 @@ Ext.define('Zan.data.panel.IframePanel', {
     loadMask: 'Loading...',
 
     config: {
+        /**
+         * @cfg {string} initial URL to load when the iframe is displayed
+         */
         src: 'about:blank',
+
+        /**
+         * @cfg {string} HTML content to display in the iframe
+         */
+        htmlContent: null,
     },
 
     renderTpl: [
