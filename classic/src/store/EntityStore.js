@@ -18,6 +18,11 @@ Ext.define('Zan.data.store.EntityStore', {
          * @cfg {Array} Additional fields to request from the API when loading this store
          */
         responseFields: null,
+
+        /**
+         * @cfg {object} If specified, these extra params are passed to the proxy
+         */
+        proxyExtraParams: null,
     },
 
     remoteSort: true,
@@ -106,6 +111,14 @@ Ext.define('Zan.data.store.EntityStore', {
         }
 
         return deferred.promise;
+    },
+
+    updateProxyExtraParams: function(params) {
+        var proxy = this.getProxy();
+
+        Ext.Object.each(params, function(key, value) {
+            proxy.setExtraParam(key, value);
+        }, this);
     },
 
     _getEntityIdForUrl: function(entityId) {
