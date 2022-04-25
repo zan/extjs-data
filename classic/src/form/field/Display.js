@@ -22,6 +22,11 @@ Ext.define('Zan.data.form.field.Display', {
          * @cfg {object} Additional options to pass to Zan.String.from()
          */
         stringConversionOptions: null,
+
+        /**
+         * @cfg {boolean} If true, html encode data
+         */
+        htmlEncode: true,
     },
 
     valueToRaw: function(value) {
@@ -46,6 +51,12 @@ Ext.define('Zan.data.form.field.Display', {
     renderer: function(value) {
         if (value === null || value === undefined) return this.getNullValueText();
 
-        return Zan.common.String.htmlEncode(Zan.common.String.from(value, this.getStringConversionOptions()));
+        var strValue = Zan.common.String.from(value, this.getStringConversionOptions());
+
+        if (this.getHtmlEncode()) {
+            strValue = Zan.common.String.htmlEncode(strValue);
+        }
+
+        return strValue;
     },
 });
