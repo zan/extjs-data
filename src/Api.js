@@ -13,6 +13,12 @@ Ext.define('Zan.data.Api', {
         return rawResult.responseData;
     },
 
+    put: async function(url, params) {
+        var rawResult = await this.makeRequest(url, 'PUT', params);
+
+        return rawResult.responseData;
+    },
+
     makeRequest: async function(url, method, params) {
         var me = this;
         var deferred = new Ext.Deferred();
@@ -27,7 +33,7 @@ Ext.define('Zan.data.Api', {
 
         // Log this request in the request store
         var debugParams = params;
-        if ('POST' === method) {
+        if ('POST' === method || 'PUT' === method) {
             debugParams = JSON.stringify(params);
         }
 
