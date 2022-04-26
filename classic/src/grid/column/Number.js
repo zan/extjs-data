@@ -4,4 +4,6 @@ Ext.define('Zan.data.grid.column.Number', {
 
     width: 100,
     align: 'right',
+
+    filterType: 'number',
 });
