@@ -15,6 +15,9 @@ Ext.define('Zan.data.grid.column.Text', {
 
     width: 200,
 
+
+    filterType: 'string',
+
     /**
      * See: https://docs.sencha.com/extjs/7.3.1/classic/Ext.grid.column.Column.html#cfg-renderer
      */
