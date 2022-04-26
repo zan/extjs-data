@@ -32,7 +32,7 @@ Ext.define('Zan.data.page.PageContainerViewController', {
             extRouteDef[url] = this._buildZanRoutingHandler(value);
 
             extRouteDef[url].conditions = {
-                'zanQueryString': '\\?([0-9a-zA-Z\\?\\&=\\-\\%\\._\'\!]+)'
+                'zanQueryString': '\\?([0-9a-zA-Z\\?\\&=\\-\\%\\._\'!]+)'
             };
         }, this);
 
