@@ -92,9 +92,6 @@ Ext.define('Zan.data.form.PopupFormPanel', {
                     handler: async function(button) {
                         if (!this.isValid(this)) return;
 
-                        var r = this.getHandler().call(this.getScope() || this, this);
-                        if (r === false) return;
-
                         if (this.getAutoSaveRecord() && this.getRecord()) {
                             this.updateRecord(this.getRecord());
                             button.setLoading("Saving...");
@@ -102,6 +99,9 @@ Ext.define('Zan.data.form.PopupFormPanel', {
                                 failure: () => { button.setLoading(false) },
                             });
                         }
+
+                        var r = this.getHandler().call(this.getScope() || this, this);
+                        if (r === false) return;
 
                         // todo: deferred support
                         this.close();
