@@ -44,7 +44,16 @@ Ext.define('Zan.data.form.PopupFormPanel', {
         /**
          * @cfg {boolean} If true, call save() on the record when the form is valid and "OK" is clicked
          */
-        autoSaveRecord: false
+        autoSaveRecord: false,
+
+        /**
+         * @cfg {function} If autoSaveRecord is true this handler will be called after a successful save
+         *
+         * Arguments:
+         *  {Zan.common.view.PopupDialogPanel} panel
+         *  {Ext.data.Model} record that was saved
+         */
+        afterSaveHandler: Ext.emptyFn,
     },
 
     // Allow tracking references
@@ -60,6 +69,7 @@ Ext.define('Zan.data.form.PopupFormPanel', {
 
     minHeight: 200,
     minWidth: 200,
+    bodyPadding: 4,
 
     // Form fields should fill full width of the popup
     layout: {
@@ -98,6 +108,8 @@ Ext.define('Zan.data.form.PopupFormPanel', {
                             await Zan.data.util.ModelUtil.save(this.getRecord(), {
                                 failure: () => { button.setLoading(false) },
                             });
+
+                            this.getAfterSaveHandler().call(this.getScope() || this, this, this.getRecord());
                         }
 
                         var r = this.getHandler().call(this.getScope() || this, this);
