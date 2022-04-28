@@ -42,7 +42,20 @@ Ext.define('Zan.data.form.RecordFormMixin', {
             // Skip if the field is not an association
             if (!Zan.data.util.ModelUtil.isAssociation(record, field.getName())) return true; // continue
 
-            Zan.data.util.ModelUtil.setValue(record, field.getName(), field.getValueRecord());
+            var value = null;
+            // If available, use custom getValueRecord()
+            // todo: really necessary?
+            if (Ext.isFunction(field.getValueRecord)) {
+                value = field.getValueRecord();
+            }
+            // Fall back to Ext's getModelData()
+            else {
+                // This returns a key/value pair, see: https://docs.sencha.com/extjs/7.5.0/classic/Ext.form.field.ComboBox.html#method-getModelData
+                var nestedValue = field.getModelData();
+                value = nestedValue[field.getName()];
+            }
+
+            Zan.data.util.ModelUtil.setValue(record, field.getName(), value);
         });
     },
 });
