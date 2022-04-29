@@ -123,6 +123,17 @@ Ext.define('Zan.data.model.EntityModel', {
     },
 
     /**
+     * Indicates that an association is dirty and should be written to the server
+     *
+     * See EntityWriter.js
+     */
+    flagAssociationAsDirty: function(roleName) {
+        this._dirtyAssociations.push(roleName);
+
+        this._dirtyAssociations = Ext.Array.unique(this._dirtyAssociations);
+    },
+
+    /**
      * This method is called by the reader when the model is loaded from remote data
      *
      * https://docs.sencha.com/extjs/7.5.0/classic/Ext.data.Model.html#method-onLoad
