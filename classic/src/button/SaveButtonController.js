@@ -43,20 +43,23 @@ Ext.define('Zan.data.button.SaveButtonController', {
         return false;
     },
 
-    trackItem: function(modelOrStore) {
+    trackItem: function(item) {
         // Early exit if we're already tracking it
-        if (this.hasTrackedItem(modelOrStore)) return true;
+        if (this.hasTrackedItem(item)) return true;
 
-        if (modelOrStore instanceof Ext.data.Model) {
+        if (item instanceof Ext.data.Model) {
             // Note: records do not support on dirty events, instead they must be polled
             // See _initDirtyRecordPoller
         }
-        if (modelOrStore instanceof Ext.data.Store) {
+        if (item instanceof Ext.data.Store) {
             // NOTE: cannot be an anonymous function because we need to remove it in clearTrackedItems
-            modelOrStore.on('datachanged', this._onStoreDataChanged, this);
+            item.on('datachanged', this._onStoreDataChanged, this);
+        }
+        if (item instanceof Ext.form.Panel) {
+            item.on('dirtychange', this._onFormDirtyChanged, this);
         }
 
-        this._trackedItems.push(modelOrStore);
+        this._trackedItems.push(item);
     },
 
     untrackItem: function(modelOrStore) {
@@ -75,19 +78,28 @@ Ext.define('Zan.data.button.SaveButtonController', {
         // todo: better error checking
 
         for (var i=0; i < this._trackedItems.length; i++) {
-            var recordOrStore = this._trackedItems[i];
+            var item = this._trackedItems[i];
 
-            if (recordOrStore instanceof Ext.data.Store) {
+            if (item instanceof Ext.data.Store) {
                 // Wait until the store has synced and then clear the dirty flag
                 // Note that this requires a 'delay' because datachanged seems to be fire multiple times
                 // and it's not possible to ensure this is called last
-                recordOrStore.on('datachanged', function() {
+                item.on('datachanged', function() {
                     this._clearDirty();
                 }, this, { single: true, delay: 50 });
-                await Zan.data.util.StoreUtil.sync(recordOrStore);
+                await Zan.data.util.StoreUtil.sync(item);
             }
-            if (recordOrStore instanceof Ext.data.Model && recordOrStore.isDirty()) {
-                await Zan.data.util.ModelUtil.save(recordOrStore);
+            if (item instanceof Ext.data.Model && item.isDirty()) {
+                await Zan.data.util.ModelUtil.save(item);
+            }
+            if (item instanceof Ext.form.Panel && item.isDirty()) {
+                var form = item;
+                // Update the form's record with the most recent data
+                var formRecord = form.getRecord();
+                form.updateRecord(formRecord);
+
+                // Save the record
+                await Zan.data.util.ModelUtil.save(formRecord);
             }
         }
 
@@ -112,8 +124,9 @@ Ext.define('Zan.data.button.SaveButtonController', {
         this._dirtyRecordPoller.start({
             run: function() {
                 this._trackedItems.forEach(function(item) {
-                    // Ignore if it's a store since they can be tracked via listeners
+                    // Ignore items that can be tracked by listeners
                     if (item instanceof Ext.data.Store) return true;
+                    if (item instanceof Ext.form.Panel) return true;
 
                     if (item.isDirty()) this._markAsDirty();
                 }, this);
@@ -125,6 +138,10 @@ Ext.define('Zan.data.button.SaveButtonController', {
 
     _onStoreDataChanged: function(store) {
         this.getViewModel().set('isDirty', true);
+    },
+
+    _onFormDirtyChanged: function(form, isDirty, opts) {
+        this.getViewModel().set('isDirty', isDirty);
     },
 
     _markAsDirty: function() {

@@ -48,6 +48,13 @@ Ext.define('Zan.data.button.SaveButton', {
         store: null,
 
         /**
+         * @cfg {Ext.form.Panel} A form panel to track changes on
+         *
+         * See also trackedItems for handling multiple forms
+         */
+        form: null,
+
+        /**
          * @cfg {string} Toast message to display when save completes
          *
          * Pass null or an empty string to avoid displaying a tost message
@@ -78,6 +85,13 @@ Ext.define('Zan.data.button.SaveButton', {
          * Clicking the save button will save all dirty items in this array
          */
         trackedItems: [],
+
+        /**
+         * @cfg {function} If set, this will be called instead of the default saving logic
+         *
+         * If you override this, you also need to manually call _clearDirty when saving is complete
+         */
+        saveHandler: null,
     },
 
     controller: { xclass: 'Zan.data.button.SaveButtonController' },
@@ -99,7 +113,16 @@ Ext.define('Zan.data.button.SaveButton', {
     },
 
     handler: function() {
-        this.getController().commitChanges();
+        var manualSaveHandler = this.getSaveHandler();
+
+        // Allow overriding save logic
+        if (Ext.isFunction(manualSaveHandler)) {
+            manualSaveHandler.call(this.getScope() || this, this);
+        }
+        // Default save handler
+        else {
+            this.getController().commitChanges();
+        }
     },
 
     applyStore: function(newStore) {
@@ -126,6 +149,10 @@ Ext.define('Zan.data.button.SaveButton', {
 
     updateRecord: function(record) {
         this.getController().trackItem(record);
+    },
+
+    updateForm: function(form) {
+        this.getController().trackItem(form);
     },
 
     updateTrackedItems: function(items) {
