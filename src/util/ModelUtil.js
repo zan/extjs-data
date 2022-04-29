@@ -5,6 +5,21 @@ Ext.define('Zan.data.util.ModelUtil', {
     singleton: true,
 
     /**
+     * Returns true if a and b represent the same record on the server
+     */
+    isSame: function(a, b) {
+        // Never the same if either is null
+        if (a === null || a === undefined) return false;
+        if (b === null || b === undefined) return false;
+
+        // Always the same if it's the same object
+        if (a === b) return true;
+
+        // Otherwise, they're the same if the IDs match
+        return a.getId() === b.getId();
+    },
+
+    /**
      * Calls record.load() and returns a promise
      *
      * @param {Ext.data.Model} record
@@ -169,6 +184,8 @@ Ext.define('Zan.data.util.ModelUtil', {
      *
      * If fieldOrAssociation is an association it will use the setter, eg. record.setExampleField(value)
      *
+     * If fieldOrAssociation is a "to many" it will update the store to contain the given records
+     *
      * @param record
      * @param fieldOrAssociation
      * @param value
@@ -176,8 +193,21 @@ Ext.define('Zan.data.util.ModelUtil', {
      */
     setValue: function(record, fieldOrAssociation, value) {
         if (this.isAssociation(record, fieldOrAssociation)) {
-            var field = record.getField(fieldOrAssociation);
-            return record[field.reference.setterName](value);
+            var association = record.associations[fieldOrAssociation];
+
+            // "to many" will have a storeName property
+            if (association.storeName) {
+                var store = record[association.getterName]();
+                Zan.data.util.StoreUtil.setRecords(store, value);
+
+                // Flag this association as being dirty
+                record.flagAssociationAsDirty(fieldOrAssociation);
+            }
+            // Single association that stores a value
+            else {
+                var field = record.getField(fieldOrAssociation);
+                return record[field.reference.setterName](value);
+            }
         }
         else {
             return record.set(fieldOrAssociation, value);
