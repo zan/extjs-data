@@ -24,8 +24,50 @@ Ext.define('Zan.data.writer.EntityWriter', {
         return this.callParent(arguments);
     },
 
+    /**
+     * Recursively ensures all data in "raw" is something that can be json-encoded
+     *
+     * This fixes an issue where calling save() on a record with a manyToMany association includes model classes
+     * in the raw data and generates a json error like "Uncaught TypeError: Converting circular structure to JSON"
+     *
+     * If this method encounters a model:
+     *
+     *      - If the record has an ID, it's assumed to be an association and only the ID is included
+     *      - If there's no ID, all record data is passed
+     */
+    _processRawRecord: function(raw) {
+        console.log("processing raw: %o", raw);
+        Ext.Object.each(raw, function(key, value, obj) {
+            // Convert models into something that can be serialized
+            if (value instanceof Ext.data.Model) {
+                obj[key] = this._encodeModel(value);
+            }
+
+            // Recurse into arrays
+            if (Ext.isArray(value)) {
+                for (var i=0; i < value.length; i++) {
+                    value[i] = this._encodeValue(value[i]);
+                }
+            }
+        }, this);
+
+        return raw;
+    },
+
     getRecordData: function(record, operation) {
         var recordData = this.callParent(arguments);
+
+        // Look for additional dirty associations that aren't picked up by Ext
+        Ext.Array.forEach(record.getDirtyAssociations(), function (association) {
+            var assocValue = record[association.getterName]();
+
+            if (assocValue instanceof Ext.data.Store) {
+                recordData[association.role] = assocValue.getRange();
+            }
+        });
+
+
+        // todo: dubious experiments below here
 
         // todo: writefields triggers additional http GET (??) requests on save when this is enabled
         //  to reproduce, on the user edit page, add write fields userDepartmentMappings, userDepartmentMappings.user, userDepartmentMappings.department
@@ -92,35 +134,6 @@ Ext.define('Zan.data.writer.EntityWriter', {
                 destination[fieldPath] = value.getId();
             }
         }
-    },
-
-    /**
-     * Recursively ensures all data in "raw" is something that can be json-encoded
-     *
-     * This fixes an issue where calling save() on a record with a manyToMany association includes model classes
-     * in the raw data and generates a json error like "Uncaught TypeError: Converting circular structure to JSON"
-     *
-     * If this method encounters a model:
-     *
-     *      - If the record has an ID, it's assumed to be an association and only the ID is included
-     *      - If there's no ID, all record data is passed
-     */
-    _processRawRecord: function(raw) {
-        Ext.Object.each(raw, function(key, value, obj) {
-            // Convert models into something that can be serialized
-            if (value instanceof Ext.data.Model) {
-                obj[key] = this._encodeModel(value);
-            }
-
-            // Recurse into arrays
-            if (Ext.isArray(value)) {
-                for (var i=0; i < value.length; i++) {
-                    value[i] = this._encodeValue(value[i]);
-                }
-            }
-        }, this);
-
-        return raw;
     },
 
     _encodeValue: function(value) {
