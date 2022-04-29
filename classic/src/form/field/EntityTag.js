@@ -35,7 +35,7 @@ Ext.define('Zan.data.form.field.EntityTag', {
     pageSize: 100,
     minChars: 3,            // Number of characters required before remote query is performed
 
-    // todo: necessary?
+    // todo: setValue() doesn't seem to work with models, this seems to be required to load real data from the server
     autoLoadOnValue: true,
 
     // Without this minWidth the paging controls are cut off when there aren't any results
