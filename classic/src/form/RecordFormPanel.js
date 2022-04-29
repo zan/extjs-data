@@ -1,16 +1,25 @@
 Ext.define('Zan.data.form.RecordFormPanel', {
     extend: 'Ext.form.Panel',
 
+    requires: [
+        'Zan.data.form.RecordFormMixin',
+    ],
+
+    mixins: {
+        recordForm: 'Zan.data.form.RecordFormMixin',
+    },
+
     config: {
+        /**
+         * @cfg {Ext.data.Model} Convenience setter for calling loadRecord() with this value
+         */
         formRecord: null,
     },
 
-    viewModel: {
-        xclass: 'Zan.data.ViewModel'
-    },
+    // By default loadRecord() should be the last state of the form to reset() to
+    trackResetOnLoad: true,
 
-    // todo: automatic way to do this?
     updateFormRecord: function(record) {
-        this.getViewModel().set('formRecord', record);
+        this.loadRecord(record);
     },
 });
