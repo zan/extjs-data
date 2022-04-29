@@ -47,6 +47,11 @@ Ext.define('Zan.data.form.PopupFormPanel', {
         autoSaveRecord: false,
 
         /**
+         * @cfg {object} If present and autoSaveRecord is true, these options will be sent to the server when saving
+         */
+        saveOptions: null,
+
+        /**
          * @cfg {function} If autoSaveRecord is true this handler will be called after a successful save
          *
          * Arguments:
@@ -103,11 +108,20 @@ Ext.define('Zan.data.form.PopupFormPanel', {
                         if (!this.isValid(this)) return;
 
                         if (this.getAutoSaveRecord() && this.getRecord()) {
+                            // note: defined in RecordFormMixin
                             this.updateRecord(this.getRecord());
                             button.setLoading("Saving...");
-                            await Zan.data.util.ModelUtil.save(this.getRecord(), {
-                                failure: () => { button.setLoading(false) },
+
+                            var saveOptions = this.getSaveOptions() || {};
+                            saveOptions = Ext.applyIf(saveOptions, {
+                                failure: function() {},
                             });
+
+                            Ext.Function.interceptAfter(saveOptions, 'failure', function(record, operation) {
+                                button.setLoading(false);
+                            });
+
+                            await Zan.data.util.ModelUtil.save(this.getRecord(), saveOptions);
 
                             this.getAfterSaveHandler().call(this.getScope() || this, this, this.getRecord());
                         }
