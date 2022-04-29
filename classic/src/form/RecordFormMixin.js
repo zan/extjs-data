@@ -27,8 +27,16 @@ Ext.define('Zan.data.form.RecordFormMixin', {
             // Skip if the field is not an association
             if (!Zan.data.util.ModelUtil.isAssociation(record, field.getName())) return true; // continue
 
-            field.setValue(Zan.data.util.ModelUtil.getValue(record, field.getName()));
-        });
+            var value = Zan.data.util.ModelUtil.getValue(record, field.getName());
+
+            // Convert stores to arrays since that's what most components expect (eg. EntityTag)
+            if (value instanceof Ext.data.Store) {
+                value = value.getRange();
+            }
+
+            field.setValue(value);
+            if (this.trackResetOnLoad) field.resetOriginalValue();
+        }, this);
     },
 
     updateRecord: function(record) {
@@ -47,6 +55,10 @@ Ext.define('Zan.data.form.RecordFormMixin', {
             // todo: really necessary?
             if (Ext.isFunction(field.getValueRecord)) {
                 value = field.getValueRecord();
+            }
+            // Fields with multiple value records, eg. Ext.form.field.Tag
+            else if (Ext.isFunction(field.getValueRecords)) {
+                value = field.getValueRecords();
             }
             // Fall back to Ext's getModelData()
             else {
