@@ -27,10 +27,7 @@ Ext.define('Zan.data.model.EntityModel', {
     extend: 'Ext.data.Model',
 
     requires: [
-        'Zan.data.field.Association',
-        'Zan.data.field.Boolean',
-        'Zan.data.field.Integer',
-        'Zan.data.field.String',
+        'Zan.data.field.*',
         'Zan.data.model.WorkflowModel'
     ],
 
