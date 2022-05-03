@@ -1,4 +1,4 @@
-Ext.define('Zan.data.grid.column.DisplayString', {
+Ext.define('Zan.data.grid.column.Boolean', {
     extend: 'Ext.grid.column.Boolean',
     alias: 'widget.zan-booleancolumn',
 
