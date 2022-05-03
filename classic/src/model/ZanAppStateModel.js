@@ -7,6 +7,10 @@
 Ext.define('Zan.data.model.ZanAppStateModel', {
     extend: 'Ext.data.Model',
 
+    requires: [
+        'Ext.data.proxy.LocalStorage',
+    ],
+
     fields: [
         { name: 'activePage', allowNull: true, persist: false, },
         { name: 'activePageClassName', type: 'string',
