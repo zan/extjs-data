@@ -89,20 +89,19 @@ Ext.define('Zan.data.page.apiViewer.ApiResponsePanel', {
     },
 
     _buildTroubleshootingHtml: function(responseInfo) {
-        var html = [
+        var headerHtml = [
             '<h2>Troubleshooting</h2>',
         ];
 
-        if ('Zan.Drest.NoPermissionsOnEntity' === responseInfo.errorCode) {
-            html.push([
-                '<div style="margin: 4px; padding: 4px; border: 1px solid #c9c9c9;">',
-                    'Check that the entity has an ApiPermissions annotation:',
-                    '<p>',
-                    '<code>@ApiPermissions(read="*", write={"App.editAllData", "ExampleProject.manageConfiguration"})</code>',
-                '</div>',
-            ].join("\n"));
-        }
+        var troubleshootingHtml = Zan.data.developerTroubleshooting
+            .DeveloperTroubleshootingRegistry
+            .buildSuggestions(
+                'API_REQUEST',
+                {
+                    responseInfo: responseInfo,
+                }
+            );
 
-        return html.join("\n");
+        return headerHtml.join("\n") + troubleshootingHtml;
     },
 });
