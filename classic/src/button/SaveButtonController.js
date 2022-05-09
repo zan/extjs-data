@@ -77,6 +77,17 @@ Ext.define('Zan.data.button.SaveButtonController', {
     commitChanges: async function() {
         // todo: better error checking
 
+        // First pass: validate any associated forms
+        var allValid = true;
+        Ext.Array.forEach(this._trackedItems, function(item) {
+            // Skip anything that's not a form
+            if (!(item instanceof Ext.form.Panel)) return true;
+
+            if (!item.isValid()) allValid = false;
+        });
+
+        if (!allValid) return;
+
         for (var i=0; i < this._trackedItems.length; i++) {
             var item = this._trackedItems[i];
 
