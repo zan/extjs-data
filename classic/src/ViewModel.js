@@ -1,3 +1,8 @@
+/**
+ * todo: might be better to override linkTo for additional model handling?
+ *  - or getRecord()?
+ *  See: https://docs.sencha.com/extjs/7.5.0/classic/src/ViewModel.js.html
+ */
 Ext.define('Zan.data.ViewModel', {
     extend: 'Ext.app.ViewModel',
 
@@ -52,6 +57,11 @@ Ext.define('Zan.data.ViewModel', {
             if (Ext.String.startsWith(params.identifier, "{")) {
                 var matches = params.identifier.match(/zanRouteParams.(\w+)}/);
                 params.identifier = zanRouteParams[matches[1]];
+            }
+
+            // Convenience for merging responseFields into params
+            if (config.responseFields !== undefined) {
+                params.responseFields = config.responseFields;
             }
 
             // Load the model with the known parameters
