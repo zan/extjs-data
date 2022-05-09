@@ -4,6 +4,17 @@
  * The button will be disabled until any of the tracked items (records or stores) are considered dirty
  *
  *
+ ### Track a form
+
+ Tip: if you're using a zan-recordform you can set a reference on it and it will be registered with the viewModel
+
+        {
+            xtype: 'zan-savebutton',
+            bind: {
+                form: '{someForm}'
+            },
+        },
+
  ### Track a single record
 
         {
