@@ -11,9 +11,11 @@
         {
             xtype: 'zan-savebutton',
             bind: {
-                form: '{someForm}'
+                form: '{someForm}' // Also: FIRST_PARENT_FORM (see below)
             },
         },
+
+ Also supported is binding the form to 'FIRST_PARENT_FORM'. In that case, it will bind to the first component found via this.up('form')
 
  ### Track a single record
 
@@ -163,6 +165,13 @@ Ext.define('Zan.data.button.SaveButton', {
     },
 
     updateForm: function(form) {
+        if ('FIRST_PARENT_FORM' === form) {
+            form = this.up('form');
+        }
+
+        if (!(form instanceof Ext.form.Panel)) {
+            throw new Error("SaveButton must be bound to an Ext.form.Panel");
+        }
         this.getController().trackItem(form);
     },
 
