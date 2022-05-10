@@ -36,7 +36,6 @@ Ext.define('Zan.data.writer.EntityWriter', {
      *      - If there's no ID, all record data is passed
      */
     _processRawRecord: function(raw) {
-        console.log("processing raw: %o", raw);
         Ext.Object.each(raw, function(key, value, obj) {
             // Convert models into something that can be serialized
             if (value instanceof Ext.data.Model) {
