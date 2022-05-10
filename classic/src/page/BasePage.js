@@ -34,14 +34,11 @@ Ext.define('Zan.data.page.BasePage', {
         delayCleanup: false,
 
         /**
-         * @cfg {string} Component to dock at the top of the page
+         * @cfg {object} Route parameters as defined in the route definition
          *
-         * todo: topDockedItemClass would be more generic?
+         * This value is assigned when PageContainerViewController creates the page after processing the route
          */
-        pageMenuClass: null,
-
-        // todo: docs
-        zanRouteParameters: null,
+        zanRouteParams: null,
     },
 
     viewModel: {
@@ -63,14 +60,8 @@ Ext.define('Zan.data.page.BasePage', {
     // https://docs.sencha.com/extjs/7.5.0/classic/Ext.panel.Panel.html#cfg-referenceHolder
     referenceHolder: true,
 
-    initComponent: function() {
-        this.callParent();
-
-        this._applyRouteParametersToViewModel();
-    },
-
-    _applyRouteParametersToViewModel() {
-        this.lookupViewModel().set('zanRouteParams', this.getZanRouteParameters());
+    updateZanRouteParams: function(value) {
+        this.lookupViewModel().set('zanRouteParams', this.getZanRouteParams());
     },
 
     setTitle: function(value) {
