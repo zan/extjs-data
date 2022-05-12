@@ -3,7 +3,7 @@ Ext.define('Zan.data.grid.column.Text', {
     alias: 'widget.zan-textcolumn',
 
     requires: [
-        'Zan.data.util.Format',
+        'Zan.common.String',
     ],
 
     config: {
@@ -11,6 +11,11 @@ Ext.define('Zan.data.grid.column.Text', {
          * @cfg {boolean} If true, escape HTML special characters
          */
         htmlEncode: true,
+
+        /**
+         * @cfg {object} Additional options to pass to Zan.common.String.from()
+         */
+        stringConversionOptions: null,
     },
 
     width: 200,
@@ -25,7 +30,7 @@ Ext.define('Zan.data.grid.column.Text', {
         var stringValue = this._getStringValue(value, record, this.dataIndex);
 
         if (this.getHtmlEncode()) {
-            stringValue = Ext.String.htmlEncode(stringValue);
+            stringValue = Zan.common.String.htmlEncode(stringValue);
         }
 
         return stringValue;
@@ -50,7 +55,7 @@ Ext.define('Zan.data.grid.column.Text', {
     },
 
     _getStringValue: function(value, record, recordField) {
-        if (this._isAssociationValue(record)) {
+        if (this._isAssociationField(record, recordField)) {
             //if (debug) debugger;
             var reference = record.getField(recordField).reference;
             value = record[reference.getterName]();
@@ -60,15 +65,38 @@ Ext.define('Zan.data.grid.column.Text', {
                 throw new Error("Grid lazy loading detected in field '" + this.dataIndex + "'. Ensure this field is returned from the API by using the responseFields configuration.");
             }
         }
+        else if (this._isToManyAssociation(record, recordField)) {
+            value = Zan.data.util.ModelUtil.getValue(record, recordField);
+        }
 
-        return Zan.data.util.Format.asString(value);
+        return Zan.common.String.from(value, this.getStringConversionOptions());
     },
 
-    _isAssociationValue: function(record) {
-        var field = record.getField(this.dataIndex);
+    /**
+     * Returns true if the field is a "has one" association defined in the fields section
+     *
+     * See also: _isToManyAssociation
+     */
+    _isAssociationField: function(record, recordField) {
+        var field = record.getField(recordField);
 
         if (!field || Ext.isEmpty(field.reference)) return false;
 
         return true;
+    },
+
+    /**
+     * Returns true if the field is a "to many" association
+     */
+    _isToManyAssociation: function(record, recordField) {
+        // Early exit if this shows up in the fields list since we know right away it's not a "to many"
+        var field = record.getField(recordField);
+        if (field) return false;
+
+        // Can't find a public way to check this, so call getAssociatedData() and see if it's present as a key
+        // Return true if recordField appears as a key in the associated data array
+        var keys = Ext.Object.getKeys(record.getAssociatedData());
+
+        return Ext.Array.contains(keys, recordField);
     },
 });
