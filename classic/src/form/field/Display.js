@@ -19,7 +19,7 @@ Ext.define('Zan.data.form.field.Display', {
         nullValueText: '',
 
         /**
-         * @cfg {object} Additional options to pass to Zan.String.from()
+         * @cfg {object} Additional options to pass to Zan.common.String.from()
          */
         stringConversionOptions: null,
 
