@@ -93,11 +93,11 @@ Ext.define('Zan.data.button.SaveButton', {
         scope: null,
 
         /**
-         * @cfg {mixed} An array of stores and models to track changes on
+         * @cfg {mixed[]} An array of stores and models to track changes on
          *
          * Clicking the save button will save all dirty items in this array
          */
-        trackedItems: [],
+        trackedItems: null,
 
         /**
          * @cfg {function} If set, this will be called instead of the default saving logic
