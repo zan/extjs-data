@@ -45,7 +45,7 @@ Ext.define('Zan.data.store.EntityStore', {
         }
         var modelClass = Ext.ClassManager.get(config.model);
         if (!modelClass) {
-            throw("Model class was not valid");
+            throw new Error("Model class '" + config.model + "'was not valid. Ensure application has been built and this file has been required.");
         }
 
         var includeMetadata = [];
