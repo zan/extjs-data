@@ -5,6 +5,8 @@
 Ext.define('Zan.data.form.field.EntityTag', {
     extend: 'Ext.form.field.Tag',
 
+    alias: 'widget.zan-entitytagfield',
+
     requires: [
         'Zan.data.util.StoreUtil',
     ],
@@ -57,6 +59,17 @@ Ext.define('Zan.data.form.field.EntityTag', {
             },
             single: true,
         },
+    },
+
+    constructor: function(config) {
+        // Default store type to 'zan-entitystore' if none is explicitly set
+        if (!Ext.isEmpty(config.store)) {
+            if (Ext.isEmpty(config.store.type) && Ext.isEmpty(config.store.xclass)) {
+                config.store.type = 'zan-entitystore';
+            }
+        }
+
+        this.callParent([ config ]);
     },
 
     initComponent: function() {
