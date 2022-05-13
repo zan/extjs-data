@@ -195,8 +195,8 @@ Ext.define('Zan.data.util.ModelUtil', {
         if (this.isAssociation(record, fieldOrAssociation)) {
             var association = record.associations[fieldOrAssociation];
 
-            // "to many" will have a storeName property
-            if (association.storeName) {
+            // "to many" associations are represented by stores
+            if (association.association instanceof Ext.data.schema.ManyToMany) {
                 var store = record[association.getterName]();
                 Zan.data.util.StoreUtil.setRecords(store, value);
 
