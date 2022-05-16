@@ -31,7 +31,6 @@ Ext.define('Zan.data.page.ApiViewerPageController', {
         try {
             result = await Zan.data.Api.makeRequest(url, formValues.method, postData);
         } catch (ex) {
-            console.log("Exception :O");
             console.log(ex);
             console.log("raw response: %o", ex.getResponseInfo());
             result = ex.getResponseInfo();
@@ -55,7 +54,6 @@ Ext.define('Zan.data.page.ApiViewerPageController', {
             console.log("Set debugLastResponse to %o", result.responseData);
         }
 
-        //this.lookupReference('responsePanel').setHtml(responseHtml);
         this.lookupReference('responsePanel').loadResponseInfo(result);
     },
 
