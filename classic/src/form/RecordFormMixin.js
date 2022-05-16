@@ -70,4 +70,21 @@ Ext.define('Zan.data.form.RecordFormMixin', {
             Zan.data.util.ModelUtil.setValue(record, field.getName(), value);
         });
     },
+
+    /**
+     * Prints information on which fields are dirty within the form
+     */
+    debugDirtyFields: function() {
+        var fields = this.getForm().getFields();
+        var dirtyInfo = [];
+
+        fields.each(function(field) {
+            dirtyInfo.push({
+                'field': field.getName(),
+                'isDirty': field.isDirty(),
+            });
+        });
+
+        console.table(dirtyInfo, ['field', 'isDirty']);
+    },
 });
