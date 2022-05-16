@@ -47,6 +47,9 @@ Ext.define('Zan.data.proxy.ZanRestProxy', {
             request.setParams(encodedParams);
         }
 
+        // All API responses should be json-encoded, including errors
+        request.setHeaders({ 'Accept': 'application/json' });
+
         return this.callParent([ request ]);
     },
 
@@ -73,8 +76,17 @@ Ext.define('Zan.data.proxy.ZanRestProxy', {
                 // Parameters are already part of the URL
             }
 
+            var prnDetails = '';
+            var responseJson = response.responseJson;
+            if (responseJson) {
+                if (responseJson.class) prnDetails += responseJson.class + "\n";
+                if (responseJson.detail) prnDetails += responseJson.detail;
+            }
+            if (prnDetails) prnDetails = '<code>' + Zan.common.String.htmlEncode(prnDetails) + '</code>';
+
             var messageHtml = [
-                'Error: ' + Ext.htmlEncode(response.status) + ' ' + Ext.htmlEncode(response.statusText),
+                Ext.htmlEncode(response.status) + ' ' + Ext.htmlEncode(response.statusText),
+                prnDetails,
                 '<a href="' + requestDebugLink + '" target="_blank">Open in API Viewer</a>',
             ].join("<p></p>");
 
