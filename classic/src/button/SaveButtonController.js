@@ -75,7 +75,8 @@ Ext.define('Zan.data.button.SaveButtonController', {
     },
 
     commitChanges: async function() {
-        // todo: better error checking
+        // Track whether all data was saved successfully
+        var successful = true;
 
         // First pass: validate any associated forms
         var allValid = true;
@@ -91,43 +92,60 @@ Ext.define('Zan.data.button.SaveButtonController', {
         for (var i=0; i < this._trackedItems.length; i++) {
             var item = this._trackedItems[i];
 
-            if (item instanceof Ext.data.Store) {
-                // Wait until the store has synced and then clear the dirty flag
-                // Note that this requires a 'delay' because datachanged seems to be fire multiple times
-                // and it's not possible to ensure this is called last
-                item.on('datachanged', function() {
-                    this._clearDirty();
-                }, this, { single: true, delay: 50 });
-                await Zan.data.util.StoreUtil.sync(item);
-            }
-            if (item instanceof Ext.data.Model && item.isDirty()) {
-                await Zan.data.util.ModelUtil.save(item);
-            }
-            if (item instanceof Ext.form.Panel && item.isDirty()) {
-                var form = item;
-                // Update the form's record with the most recent data
-                var formRecord = form.getRecord();
-                form.updateRecord(formRecord);
+            try {
+                if (item instanceof Ext.data.Store) {
+                    // Wait until the store has synced and then clear the dirty flag
+                    // Note that this requires a 'delay' because datachanged seems to be fire multiple times
+                    // and it's not possible to ensure this is called last
+                    item.on('datachanged', function() {
+                        this._clearDirty();
+                    }, this, { single: true, delay: 50 });
 
-                // Save the record
-                await Zan.data.util.ModelUtil.save(formRecord);
+                    await Zan.data.util.StoreUtil.sync(item);
+                }
+                if (item instanceof Ext.data.Model && item.isDirty()) {
+                    await Zan.data.util.ModelUtil.save(item);
+                }
+                if (item instanceof Ext.form.Panel && item.isDirty()) {
+                    var form = item;
+                    // Update the form's record with the most recent data
+                    var formRecord = form.getRecord();
+                    form.updateRecord(formRecord);
+
+                    // Save the record
+                    await Zan.data.util.ModelUtil.save(formRecord);
+
+                    // Load the updated record back into the form
+                    form.loadRecord(formRecord);
+                }
+            }
+            catch (e) {
+                if (e instanceof ZanDataApiError) {
+                    successful = false;
+                    Zan.data.Api.displayApiError(e);
+                }
+                else {
+                    throw(e);
+                }
             }
         }
 
-        this._clearDirty();
+        if (successful) {
+            this._clearDirty();
 
-        var successHandler = this.getView().getSuccessHandler();
-        if (Ext.isFunction(successHandler)) {
-            successHandler.call(this.getView().getScope(), this.getView());
-        }
+            var successHandler = this.getView().getSuccessHandler();
+            if (Ext.isFunction(successHandler)) {
+                successHandler.call(this.getView().getScope(), this.getView());
+            }
 
-        var successToastMessage = this.getView().getSuccessToastMessage();
-        if (successToastMessage) {
-            Ext.toast(successToastMessage);
-        }
+            var successToastMessage = this.getView().getSuccessToastMessage();
+            if (successToastMessage) {
+                Ext.toast(successToastMessage);
+            }
 
-        if (this.getView().getGoBackAfterSave()) {
-            history.go(-1);
+            if (this.getView().getGoBackAfterSave()) {
+                history.go(-1);
+            }
         }
     },
 
