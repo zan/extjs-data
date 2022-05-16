@@ -90,8 +90,16 @@ Ext.define('Zan.data.util.ModelUtil', {
         }
         options.failure = function(record, operation) {
             originalFailureFn.call(options.scope, record, operation);
-            // todo: better rejection exception (requires server returning a json response)
-            deferred.reject("Server error, see network request for more details");
+
+            var httpError = operation.getError();
+            deferred.reject(new ZanDataApiError(
+                "API call failed: '" + Ext.htmlEncode(httpError.status + ': ' + httpError.statusText) + "'. See the network tab for more details.",
+                {
+                    extResponse: operation.getResponse(),
+                    httpStatus: operation.getError().status,
+                    httpStatusText: operation.getError().statusText,
+                },
+            ));
         };
 
         var originalCallbackFn = Ext.emptyFn;
