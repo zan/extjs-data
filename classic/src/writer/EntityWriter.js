@@ -14,6 +14,43 @@ Ext.define('Zan.data.writer.EntityWriter', {
     },
 
     /**
+     * OVERRIDDEN to ensure dirty associations are included when saving models
+     *
+     * This method converts data in record to raw data that gets passed to writeRecords
+     */
+    getRecordData: function(record, operation) {
+        var recordData = this.callParent(arguments);
+
+        // Look for additional dirty associations that aren't picked up by Ext
+        Ext.Array.forEach(record.getDirtyAssociations(), function (association) {
+            var assocValue = record[association.getterName]();
+
+            if (assocValue instanceof Ext.data.Store) {
+                recordData[association.role] = assocValue.getRange();
+            }
+        });
+
+
+        // todo: dubious experiments below here
+
+        // todo: writefields triggers additional http GET (??) requests on save when this is enabled
+        //  to reproduce, on the user edit page, add write fields userDepartmentMappings, userDepartmentMappings.user, userDepartmentMappings.department
+        var writeFields = record.getWriteFields();
+
+        Ext.Array.forEach(writeFields, function(item) {
+            this._resolveFieldValueAndStore(record, item, recordData);
+        }, this);
+
+        // todo: is this feature actually necessary? was originally added to work around 'role' name conflict, but that
+        //  was resolved by renaming the associationRole to 'permissionsRole'
+        if (Ext.isFunction(record.zanModifySaveData)) {
+            record.zanModifySaveData(recordData);
+        }
+
+        return recordData;
+    },
+
+    /**
      * OVERRIDDEN for improved record handling, see _processRawRecord
      */
     writeRecords: function(request, rawRecords) {
@@ -51,38 +88,6 @@ Ext.define('Zan.data.writer.EntityWriter', {
         }, this);
 
         return raw;
-    },
-
-    getRecordData: function(record, operation) {
-        var recordData = this.callParent(arguments);
-
-        // Look for additional dirty associations that aren't picked up by Ext
-        Ext.Array.forEach(record.getDirtyAssociations(), function (association) {
-            var assocValue = record[association.getterName]();
-
-            if (assocValue instanceof Ext.data.Store) {
-                recordData[association.role] = assocValue.getRange();
-            }
-        });
-
-
-        // todo: dubious experiments below here
-
-        // todo: writefields triggers additional http GET (??) requests on save when this is enabled
-        //  to reproduce, on the user edit page, add write fields userDepartmentMappings, userDepartmentMappings.user, userDepartmentMappings.department
-        var writeFields = record.getWriteFields();
-
-        Ext.Array.forEach(writeFields, function(item) {
-            this._resolveFieldValueAndStore(record, item, recordData);
-        }, this);
-
-        // todo: is this feature actually necessary? was originally added to work around 'role' name conflict, but that
-        //  was resolved by renaming the associationRole to 'permissionsRole'
-        if (Ext.isFunction(record.zanModifySaveData)) {
-            record.zanModifySaveData(recordData);
-        }
-
-        return recordData;
     },
 
     /**
