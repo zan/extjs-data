@@ -121,7 +121,18 @@ Ext.define('Zan.data.form.PopupFormPanel', {
                                 button.setLoading(false);
                             });
 
-                            await Zan.data.util.ModelUtil.save(this.getRecord(), saveOptions);
+                            try {
+                                await Zan.data.util.ModelUtil.save(this.getRecord(), saveOptions);
+                            } catch (e) {
+                                // NOTE: 'failure' interceptor defined above is also called
+                                if (e instanceof ZanDataApiError) {
+                                    Zan.data.Api.displayApiError(e);
+                                    return false;
+                                }
+                                else {
+                                    throw(e);
+                                }
+                            }
 
                             this.getAfterSaveHandler().call(this.getScope() || this, this, this.getRecord());
                         }
