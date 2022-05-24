@@ -15,6 +15,10 @@ Ext.define('Zan.data.util.ModelUtil', {
         // Always the same if it's the same object
         if (a === b) return true;
 
+        // Never the same if they're not both objects
+        // todo: safe to compare id-like things to objects here?
+        if (!Ext.isObject(a) || !Ext.isObject(b)) return false;
+
         // Otherwise, they're the same if the IDs match
         return a.getId() === b.getId();
     },
