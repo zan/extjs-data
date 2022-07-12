@@ -1,12 +1,10 @@
 /**
- * Provides a button for saving models or stores
+ * Provides a button for saving models, forms, or stores
  *
- * The button will be disabled until any of the tracked items (records or stores) are considered dirty
+ * The button will be disabled until any of the tracked items (records, forms, or stores) are considered dirty
  *
  *
  ### Track a form
-
- Tip: if you're using a zan-recordform you can set a reference on it and it will be registered with the viewModel
 
         {
             xtype: 'zan-savebutton',
@@ -16,6 +14,15 @@
         },
 
  Also supported is binding the form to 'FIRST_PARENT_FORM'. In that case, it will bind to the first component found via this.up('form')
+
+ For example:
+
+        {
+            xtype: 'zan-savebutton',
+            bind: {
+                form: 'FIRST_PARENT_FORM',
+            },
+        },
 
  ### Track a single record
 
