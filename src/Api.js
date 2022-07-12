@@ -19,6 +19,12 @@ Ext.define('Zan.data.Api', {
         return rawResult.responseData;
     },
 
+    delete: async function(url, params) {
+        var rawResult = await this.makeRequest(url, 'DELETE', params);
+
+        return rawResult.responseData;
+    },
+
     /**
      * Displays an API error to the user in a popup
      *
