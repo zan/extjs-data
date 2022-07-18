@@ -102,6 +102,7 @@ Ext.define('Zan.data.form.PopupFormPanel', {
             items: [
                 {
                     xtype: 'button',
+                    reference: 'okButton',
                     text: 'OK',
                     scale: 'medium',
                     handler: async function(button) {
@@ -110,7 +111,6 @@ Ext.define('Zan.data.form.PopupFormPanel', {
                         if (this.getAutoSaveRecord() && this.getRecord()) {
                             // note: defined in RecordFormMixin
                             this.updateRecord(this.getRecord());
-                            button.setLoading("Saving...");
 
                             var saveOptions = this.getSaveOptions() || {};
                             saveOptions = Ext.applyIf(saveOptions, {
@@ -122,8 +122,11 @@ Ext.define('Zan.data.form.PopupFormPanel', {
                             });
 
                             try {
+                                this._indicateLoading();
                                 await Zan.data.util.ModelUtil.save(this.getRecord(), saveOptions);
                             } catch (e) {
+                                this._clearLoading();
+
                                 // NOTE: 'failure' interceptor defined above is also called
                                 if (e instanceof ZanDataApiError) {
                                     Zan.data.Api.displayApiError(e);
@@ -147,6 +150,7 @@ Ext.define('Zan.data.form.PopupFormPanel', {
                 },
                 {
                     xtype: 'button',
+                    reference: 'cancelButton',
                     text: 'Cancel',
                     scale: 'medium',
                     margin: '0 0 0 10',
@@ -163,6 +167,28 @@ Ext.define('Zan.data.form.PopupFormPanel', {
         });
 
         return docked;
+    },
+
+    _indicateLoading: function() {
+        var okButton = this.lookup('okButton');
+        var cancelButton = this.lookup('cancelButton');
+
+        okButton.setText('');
+        okButton.setIconCls('x-fa fa-spinner fa-spin');
+        okButton.disable();
+
+        cancelButton.disable();
+    },
+
+    _clearLoading: function() {
+        var okButton = this.lookup('okButton');
+        var cancelButton = this.lookup('cancelButton');
+
+        okButton.setText('OK');
+        okButton.setIconCls('');
+        okButton.enable();
+
+        cancelButton.enable();
     },
 
 });
