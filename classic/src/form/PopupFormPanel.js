@@ -1,5 +1,17 @@
 /**
- * 
+ * ### Events
+ *
+ * beforesave - fires before the record is saved to the server
+ *      Returning false will prevent the record from being saved
+ *      arguments:
+ *          form - this form
+ *          record - the record that is about to be saved
+ *
+ * save - fires after the record has been saved to the server
+ *      Returning false will prevent further handlers from being called
+ *      arguments:
+ *          form - this form
+ *          record - the record that was saved
  */
 Ext.define('Zan.data.form.PopupFormPanel', {
     extend: 'Ext.form.Panel',
@@ -21,7 +33,6 @@ Ext.define('Zan.data.form.PopupFormPanel', {
          * The popup is considered valid if isValid() returns true
          * todo Return an Ext.deferred to set the form's state to "loading" until it resolves
          *
-         * todo: document arguments correctly
          * Arguments:
          *  {Zan.common.view.PopupDialogPanel} panel
          */
@@ -121,9 +132,17 @@ Ext.define('Zan.data.form.PopupFormPanel', {
                                 button.setLoading(false);
                             });
 
+                            if (!this.fireEvent('beforesave', this, this.getRecord())) {
+                                return;
+                            }
+
                             try {
                                 this._indicateLoading();
                                 await Zan.data.util.ModelUtil.save(this.getRecord(), saveOptions);
+
+                                if (!this.fireEvent('save', this, this.getRecord())) {
+                                    return;
+                                }
                             } catch (e) {
                                 this._clearLoading();
 
