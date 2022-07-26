@@ -14,7 +14,11 @@ Ext.define('Zan.data.grid.column.Boolean', {
     trueText: 'Yes',
     falseText: 'No',
 
-    filterType: 'boolean',
+    filterType: {
+        type: 'boolean',
+
+        operators: ['==', '!=', 'empty', 'nempty'],
+    },
 
     /**
      * OVERRIDDEN to support nullText option

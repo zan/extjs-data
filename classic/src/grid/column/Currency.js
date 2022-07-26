@@ -5,5 +5,9 @@ Ext.define('Zan.data.grid.column.Currency', {
     width: 100,
     renderer: Ext.util.Format.usMoney,
 
-    filterType: 'number',
+    filterType: {
+        type: 'number',
+
+        operators: ['==', '!=', '>', '>=', '<', '<=', 'empty', 'nempty'],
+    },
 });
