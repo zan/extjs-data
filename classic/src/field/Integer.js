@@ -12,6 +12,8 @@ Ext.define('Zan.data.field.Integer', {
         zanLabelableField: 'Zan.data.model.LabelableFieldMixin'
     },
 
+    allowNull: true,
+
     getType: function() {
         return 'zan-int';
     },
