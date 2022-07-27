@@ -22,5 +22,16 @@ Ext.define('Zan.data.model.WorkflowModel', {
                     parameters -> object with properties
          */
         { name: 'validGraphTransitions' },
+
+        /*
+            An object with the following properties:
+                id - the internal ID of the entity associated with this workflow
+                namespace - fully-qualified namespace of the entity
+                version - current entity version
+                workflowStatus - the current place in the workflow
+
+            See zan/doctrine-rest-bundle/src/Response/WorkflowResponse.php
+         */
+        { name: 'entity' },
     ],
 });
