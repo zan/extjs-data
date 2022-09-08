@@ -69,6 +69,8 @@ Ext.define('Zan.data.Api', {
         var me = this;
         var deferred = new Ext.Deferred();
         params = params || {};
+        var requestLogStore = Ext.data.StoreManager.get('Zan.data.DebugRequestLogStore');
+        var request = null;
 
         var responseInfo = {
             requestSuccessful: null,
@@ -82,12 +84,6 @@ Ext.define('Zan.data.Api', {
         if ('POST' === method || 'PUT' === method) {
             debugParams = JSON.stringify(params);
         }
-
-        var debugRestRequest = Zan.data.store.DebugRequestLogStore.add({
-            url: url,
-            method: method,
-            parameters: debugParams,
-        })[0];
 
         var requestConfig = {
             url: url,
@@ -107,7 +103,6 @@ Ext.define('Zan.data.Api', {
             failure: (response, opts) => {
                 responseInfo = me._parseRawResponse(response);
                 responseInfo.requestSuccessful = false;
-                debugRestRequest.set('isError', true);
 
                 // todo: return json error response from the server
                 //deferred.reject("Check the network tab for more details");
@@ -119,7 +114,9 @@ Ext.define('Zan.data.Api', {
             },
 
             callback: function(options, wasSuccessful, response) {
-                debugRestRequest.set('responseAt', new Date());
+                if (requestLogStore) {
+                    requestLogStore.addFromRawRequest(request, wasSuccessful, response);
+                }
             },
         };
 
@@ -128,7 +125,7 @@ Ext.define('Zan.data.Api', {
             requestConfig.jsonData = params;
         }
 
-        Ext.Ajax.request(requestConfig);
+        request = Ext.Ajax.request(requestConfig);
 
         return deferred.promise;
     },
