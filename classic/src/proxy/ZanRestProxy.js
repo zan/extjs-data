@@ -57,7 +57,7 @@ Ext.define('Zan.data.proxy.ZanRestProxy', {
         var requestLogStore = Ext.data.StoreManager.get('Zan.data.DebugRequestLogStore');
 
         if (requestLogStore) {
-            requestLogStore.addFromRawRequest(request, success);
+            requestLogStore.addFromRawRequest(request, success, response);
         }
 
         // Display a dialog for critical server errors (500 range)
