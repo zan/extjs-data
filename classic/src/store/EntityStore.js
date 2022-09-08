@@ -1,3 +1,14 @@
+/**
+ * ### Permissions integration
+ *
+ * Set the includePermissionsMetadata to true to enable permissions integration
+ *
+ * When a response comes back from the server, each record will have information on whether it can be edited.
+ * In addition, the _canCreateEntities property will indicate whether the logged in user is able to create new entities
+ *
+ * Note that this requires at least one load call to fire since it retrieves this information from the server.
+ *
+ */
 Ext.define('Zan.data.store.EntityStore', {
     extend: 'Ext.data.Store',
 
@@ -13,6 +24,11 @@ Ext.define('Zan.data.store.EntityStore', {
          * @cfg {boolean} If true, include metadata related to whether the record can be edited
          */
         includeEditabilityMetadata: false,
+
+        /**
+         * @cfg {boolean} If true, include metadata related to permissions (whether entities can be created/edited)
+         */
+        includePermissionsMetadata: false,
 
         /**
          * @cfg {Array} Additional fields to request from the API when loading this store
@@ -40,6 +56,11 @@ Ext.define('Zan.data.store.EntityStore', {
          */
         this._zanIsLoading = false;
 
+        // Bindable property that indicates whether or not the server allows creating new entities
+        // Requires that includePermissionsMetadata is true
+        // See _processMetadata for where this is updated
+        this._canCreateEntities = false;
+
         if (!config.model) {
             throw("'model' is a required config parameter");
         }
@@ -47,18 +68,6 @@ Ext.define('Zan.data.store.EntityStore', {
         if (!modelClass) {
             throw new Error("Model class '" + config.model + "'was not valid. Ensure application has been built and this file has been required.");
         }
-
-        var includeMetadata = [];
-        if (config.includeEditabilityMetadata) {
-            includeMetadata.push('editability');
-        }
-
-        var extraParams = config.extraParams || {};
-        if (includeMetadata.length > 0) {
-            extraParams.includeMetadata = includeMetadata;
-        }
-
-        // todo: includeMetadata needs to be passed when calling load() methods
 
         this.callParent([config]);
     },
@@ -78,6 +87,16 @@ Ext.define('Zan.data.store.EntityStore', {
         if (this.getIncludeEditabilityMetadata()) {
             options.params.includeMetadata.push('editability');
         }
+        if (this.getIncludePermissionsMetadata()) {
+            options.params.includeMetadata.push('permissions');
+        }
+
+        // Listen for the response to this load command
+        this.on('load', function(store, records, successful, operation, eOpts) {
+            if (!successful) return;
+
+            this._processMetadata(operation.getResponse());
+        }, this, { single: true });
 
         return this.callParent([ options ]);
     },
@@ -119,6 +138,17 @@ Ext.define('Zan.data.store.EntityStore', {
         Ext.Object.each(params, function(key, value) {
             proxy.setExtraParam(key, value);
         }, this);
+    },
+
+    _processMetadata: function(response) {
+        var responseJson = response.responseJson;
+
+        // Nothing to do if there's no metadata
+        if (!responseJson || !Ext.isObject(responseJson.metadata)) return;
+
+        var metadata = responseJson.metadata;
+
+        this._canCreateEntities = !!metadata.canCreateEntities;
     },
 
     _getEntityIdForUrl: function(entityId) {
