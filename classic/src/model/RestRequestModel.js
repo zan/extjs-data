@@ -11,6 +11,7 @@ Ext.define('Zan.data.model.RestRequestModel', {
         { name: 'url', type: 'string' },
         { name: 'method', type: 'string' },
         { name: 'parameters', type: 'string' },
-        { name: 'isError', type: 'bool' }
+        { name: 'isError', type: 'bool' },
+        { name: 'remoteDebugLink', type: 'string' },
     ]
 });
