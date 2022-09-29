@@ -43,7 +43,11 @@ Ext.define('Zan.data.page.ApiViewerPageController', {
         this._syncUrl();
 
         if (result.sfProfilerUrl) {
-            this.lookupReference('sfProfilerIframe').load(result.sfProfilerUrl);
+            // Briefly delay to give SF time to write profiler information to disk
+            var me = this;
+            setTimeout(function() {
+                me.lookupReference('sfProfilerIframe').load(result.sfProfilerUrl);
+            }, 100);
         }
 
         // Might get back json data
