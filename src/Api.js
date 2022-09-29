@@ -48,7 +48,7 @@ Ext.define('Zan.data.Api', {
         else {
             message = [
                 'There was a problem handling your request',
-                'Technical details: HTTP ' + Ext.htmlEncode(responseInfo.httpStatus + ': ' + responseInfo.httpStatusText),
+                'Technical details: HTTP ' + Ext.htmlEncode(ex.getHttpStatusCode() + ': ' + ex.getHttpStatusText()),
             ].join("<p>");
         }
 
@@ -108,7 +108,8 @@ Ext.define('Zan.data.Api', {
                 //deferred.reject("Check the network tab for more details");
                 var error = new ZanDataApiError(
                     "API call failed: '" + responseInfo.errorMessage + "'. See the network tab for more details.",
-                    responseInfo
+                    responseInfo,
+                    response
                 );
                 deferred.reject(error);
             },
@@ -181,14 +182,30 @@ Ext.define('Zan.data.Api', {
 
 // todo: can this move to overrides or some other file?
 class ZanDataApiError extends Error {
-    constructor(message, responseInfo) {
+    constructor(message, responseInfo, rawResponse) {
         super(message);
 
         this.name = "ZanDataApiError";
         this.responseInfo = responseInfo;
+        this.rawResponse = rawResponse;
+
+        this.httpStatusCode = rawResponse.status;
+        this.httpStatusText = rawResponse.statusText;
     }
 
     getResponseInfo() {
         return this.responseInfo;
+    }
+
+    getRawResponse() {
+        return this.rawResponse;
+    }
+
+    getHttpStatusCode() {
+        return this.httpStatusCode;
+    }
+
+    getHttpStatusText() {
+        return this.httpStatusText;
     }
 }
