@@ -19,7 +19,7 @@ Ext.define('Zan.data.model.ZanAppStateModel', {
             }
         },
 
-        { name: 'zanDebugBarShowing', type: 'bool' },
+        { name: 'zanDebugBarShowing', type: 'bool', allowNull: true },
         { name: 'zanDesignUiShowing', type: 'bool' },
     ],
 
