@@ -96,7 +96,8 @@ Ext.define('Zan.data.form.field.EntityCombo', {
             throw new Error("This field must have a 'name' set to use zanValueRecord");
         }
 
-        this.setValue(record.zanGet(this.getName()));
+        var value = Zan.data.util.ModelUtil.getValue(record, this.getName());
+        this.setValue(value);
     },
 
     _onChange: function(combo, newValue, oldValue, opts) {
