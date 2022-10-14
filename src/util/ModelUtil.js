@@ -130,11 +130,11 @@ Ext.define('Zan.data.util.ModelUtil', {
      * For example, an integer 123 that represents a primary key is equivalent to a record where record.getId() returns 123
      */
     setIfDifferent: function(record, fieldName, newValue) {
-        var recordValue = record.zanGet(fieldName);
+        var recordValue = Zan.data.util.ModelUtil.getValue(record, fieldName);
 
         if (this.entityValueIsEqual(recordValue, newValue)) return;
 
-        record.zanSet(fieldName, newValue);
+        Zan.data.util.ModelUtil.setValue(record, fieldName, newValue);
     },
 
     /**
