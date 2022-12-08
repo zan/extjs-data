@@ -39,9 +39,37 @@ Ext.define('Zan.data.reader.EntityReader', {
             }
         }
 
+        // Convert response-level entity deletability data to _isDeletable flag on each record
+        if (rawData && rawData.metadata && rawData.metadata.deletability) {
+            Ext.Array.forEach(rawData.data, function(rawRecord) {
+                rawRecord._isDeletable = this._uncompressMap(rawRecord, rawData.metadata.deletability);
+            }, this);
+        }
+
         return rawData;
     },
 
+    /**
+     * Examines a compressed map of boolean data (eg. "editability") and resolves the value
+     * for the specific record being processed
+     */
+    _uncompressMap: function(rawRecord, mapData) {
+        var defaultValue = mapData.default;
+
+        // If there's no 'exceptions' property then all records have the default value
+        if (!mapData.exceptions) return defaultValue;
+
+        // Look it up in the exceptions array
+        // todo: should consult idProperty
+        if (Ext.Array.contains(mapData.exceptions, rawRecord.id)) return !defaultValue;
+
+        // Not in exceptions array so it has default value
+        return defaultValue;
+    },
+
+    /**
+     * todo: move this to using _uncompressMap
+     */
     _calculateRecordEditability: function(raw, editability) {
         var defaultEditability = editability.default;
 

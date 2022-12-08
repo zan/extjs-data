@@ -38,6 +38,7 @@ Ext.define('Zan.data.model.EntityModel', {
         { name: '_isAnyFieldEditable', type: 'bool', allowNull: true, persist: false, },
         { name: '_allFieldsReadOnly', type: 'bool', allowNull: true, persist: false, },
         { name: '_editableFields', type: 'auto', default: {}, persist: false },
+        { name: '_isDeletable', type: 'bool', allowNull: true, persist: false, },
 
         { name: 'workflow', type: 'zan-association',
             reference: {

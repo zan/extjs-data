@@ -26,6 +26,11 @@ Ext.define('Zan.data.store.EntityStore', {
         includeEditabilityMetadata: false,
 
         /**
+         * @cfg {boolean} If true, include metadata related to whether the record can be deleted
+         */
+        includeDeletabilityMetadata: false,
+
+        /**
          * @cfg {boolean} If true, include metadata related to permissions (whether entities can be created/edited)
          */
         includePermissionsMetadata: false,
@@ -86,6 +91,9 @@ Ext.define('Zan.data.store.EntityStore', {
 
         if (this.getIncludeEditabilityMetadata()) {
             options.params.includeMetadata.push('editability');
+        }
+        if (this.getIncludeDeletabilityMetadata()) {
+            options.params.includeMetadata.push('deletability');
         }
         if (this.getIncludePermissionsMetadata()) {
             options.params.includeMetadata.push('permissions');
