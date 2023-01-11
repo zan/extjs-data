@@ -36,7 +36,7 @@ Ext.define('Zan.data.form.PopupFormPanel', {
          * Arguments:
          *  {Zan.common.view.PopupDialogPanel} panel
          */
-        handler: Ext.emptyFn,
+        handler: null,
 
         /**
          * @cfg {function} Function to call when OK is pressed
@@ -45,7 +45,7 @@ Ext.define('Zan.data.form.PopupFormPanel', {
          * todo Return an Ext.deferred to set the form's state to "loading" until it resolves
          *
          */
-        cancelHandler: Ext.emptyFn,
+        cancelHandler: null,
 
         /**
          * @cfg {*} scope to use when calling functions
@@ -210,4 +210,27 @@ Ext.define('Zan.data.form.PopupFormPanel', {
         cancelButton.enable();
     },
 
+    /**
+     * This method is overridden because specifying Ext.emptyFn in the config section prevents child classes
+     * from overriding this method by implementing it in the class.
+     *
+     * @returns {function}
+     */
+    getHandler: function() {
+        if (!this.handler) return Ext.emptyFn;
+
+        return this.handler;
+    },
+
+    /**
+     * This method is overridden because specifying Ext.emptyFn in the config section prevents child classes
+     * from overriding this method by implementing it in the class.
+     *
+     * @returns {function}
+     */
+    getCancelHandler: function() {
+        if (!this.cancelHandler) return Ext.emptyFn;
+
+        return this.cancelHandler;
+    },
 });
