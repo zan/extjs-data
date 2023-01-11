@@ -62,10 +62,11 @@ Ext.define('Zan.data.form.field.EntityCombo', {
     },
 
     listeners: {
-        // Load the store the first time the combo box is expanded
+        // Ensure the store has been loaded the first time the combo box is expanded
         expand: {
             fn: function(combo, opts) {
-                combo.getStore().load();
+                var store = combo.getStore();
+                if (!store.isLoaded()) combo.getStore().load();
             },
             single: true,
         },
