@@ -84,7 +84,7 @@ Ext.define('Zan.data.form.field.EntityCombo', {
      * @returns {Ext.data.Model}
      */
     getValueRecord: function() {
-        var record = this.findRecordByValue(this.getValue());
+        var record = this.getStore().getById(this.getValue());
 
         // Not found, return null
         if (record === false) return null;
