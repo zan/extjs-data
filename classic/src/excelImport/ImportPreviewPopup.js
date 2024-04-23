@@ -1,7 +1,7 @@
 /**
  * Popup that displays which records will be created
  */
-Ext.define('Zan.data.excelImportImportPreviewPopup', {
+Ext.define('Zan.data.excelImport.ImportPreviewPopup', {
     extend: 'Zan.common.view.PopupDialogPanel',
 
     config: {
@@ -31,7 +31,7 @@ Ext.define('Zan.data.excelImportImportPreviewPopup', {
     initComponent: function() {
         this.callParent(arguments);
 
-        this.add(Ext.create('Zan.data.excelImportImportPreviewGrid', {
+        this.add(Ext.create('Zan.data.excelImport.ImportPreviewGrid', {
             excelColumns: this.getExcelColumns(),
             importedData: this.getImportedData(),
             flex: 1,

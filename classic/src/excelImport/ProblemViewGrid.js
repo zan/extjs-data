@@ -1,7 +1,7 @@
 /**
  * Renders problems with an excel import
  */
-Ext.define('Zan.data.excelImportProblemViewGrid', {
+Ext.define('Zan.data.excelImport.ProblemViewGrid', {
     extend: 'Ext.grid.Panel',
 
     config: {

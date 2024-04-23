@@ -3,7 +3,7 @@
  *
  * Usage example:
 
-        var importer = Ext.create('Zan.data.excelImportExcelImporter', {
+        var importer = Ext.create('Zan.data.excelImport.ExcelImporter', {
             title: 'Import Specimens',
             excelTemplate: 'Modules.MyBundle.ExcelImport.SomeExcelTemplate',
             extraParams: {
@@ -24,7 +24,7 @@
  *  The importCommitted event is fired after the server has processed the import and created new entities
  *
  */
-Ext.define('Zan.data.excelImportExcelImporter', {
+Ext.define('Zan.data.excelImport.ExcelImporter', {
 
     mixins: [
         'Ext.mixin.Observable'
@@ -53,7 +53,7 @@ Ext.define('Zan.data.excelImportExcelImporter', {
     },
 
     startImport: function() {
-        this._chooseFilePopup = Ext.create('Zan.data.excelImportChooseFilePopup', {
+        this._chooseFilePopup = Ext.create('Zan.data.excelImport.ChooseFilePopup', {
             excelTemplate: this.getExcelTemplate(),
             listeners: {
                 fileSelected: function(fileButton, formData, fileDomEl, arrayBufferContent) {
@@ -98,7 +98,7 @@ Ext.define('Zan.data.excelImportExcelImporter', {
 
         // Show a detailed popup if there were problems with the upload
         if (jsonData.problems && jsonData.problems.length > 0) {
-            Ext.create('Zan.data.excelImportProblemViewPopup', {
+            Ext.create('Zan.data.excelImport.ProblemViewPopup', {
                 excelColumns: jsonData.columns,
                 rawExcelData: jsonData.rawExcelData,
                 rawProblems: jsonData.problems,
@@ -107,7 +107,7 @@ Ext.define('Zan.data.excelImportExcelImporter', {
             return;
         }
 
-        Ext.create('Zan.data.excelImportImportPreviewPopup', {
+        Ext.create('Zan.data.excelImport.ImportPreviewPopup', {
             excelColumns: jsonData.columns,
             importedData: jsonData.previewData,
             handler: function() {

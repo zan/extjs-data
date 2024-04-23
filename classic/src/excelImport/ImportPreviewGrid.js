@@ -1,7 +1,7 @@
 /**
  * Grid displaying the data to be imported
  */
-Ext.define('Zan.data.excelImportImportPreviewGrid', {
+Ext.define('Zan.data.excelImport.ImportPreviewGrid', {
     extend: 'Ext.grid.Panel',
 
     config: {

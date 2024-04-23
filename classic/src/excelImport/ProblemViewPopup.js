@@ -1,7 +1,7 @@
 /**
  * Renders a UI that shows problems with the uploaded Excel file
  */
-Ext.define('Zan.data.excelImportProblemViewPopup', {
+Ext.define('Zan.data.excelImport.ProblemViewPopup', {
     extend: 'Ext.panel.Panel',
 
     config: {
@@ -81,7 +81,7 @@ Ext.define('Zan.data.excelImportProblemViewPopup', {
     initComponent: function() {
         this.callParent(arguments);
 
-        this.add(Ext.create('Zan.data.excelImportProblemViewGrid', {
+        this.add(Ext.create('Zan.data.excelImport.ProblemViewGrid', {
             reference: 'problemViewGrid',
             excelColumns: this.getExcelColumns(),
             rawExcelData: this.getRawExcelData(),
@@ -89,7 +89,7 @@ Ext.define('Zan.data.excelImportProblemViewPopup', {
             flex: 1,
         }));
 
-        this.add(Ext.create('Zan.data.excelImportProblemListGrid', {
+        this.add(Ext.create('Zan.data.excelImport.ProblemListGrid', {
             excelColumns: this.getExcelColumns(),
             rawProblems: this.getRawProblems(),
             flex: 1,

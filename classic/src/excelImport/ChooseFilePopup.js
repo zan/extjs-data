@@ -5,7 +5,7 @@
  *
  * You probably don't want to use this class directly. Instead, use Zan.data.excelImport.ExcelImporter
  */
-Ext.define('Zan.data.excelImportChooseFilePopup', {
+Ext.define('Zan.data.excelImport.ChooseFilePopup', {
     extend: 'Ext.panel.Panel',
 
     config: {

@@ -1,7 +1,7 @@
 /**
  * A grid that shows a text-based list of all problems with the Excel upload
  */
-Ext.define('Zan.data.excelImportProblemListGrid', {
+Ext.define('Zan.data.excelImport.ProblemListGrid', {
     extend: 'Ext.grid.Panel',
 
     config: {
