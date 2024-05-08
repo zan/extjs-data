@@ -4,6 +4,10 @@
 Ext.define('Zan.data.excelImport.ProblemViewGrid', {
     extend: 'Ext.grid.Panel',
 
+    requires: [
+        'Ext.grid.selection.SpreadsheetModel',
+    ],
+
     config: {
         /**
          * @cfg object[] Array of objects describing the Excel columns
