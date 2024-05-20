@@ -42,6 +42,13 @@ Ext.define('Zan.data.excelImport.ExcelImporter', {
          * @cfg {object} Additional values to send to the server when previewing and committing the import
          */
         extraParams: null,
+
+        /**
+         * @cfg {string} HTML to display in the Excel Import popup
+         *
+         * NOTE: No escaping is done on this field!
+         */
+        userMessageHtml: null,
     },
 
     constructor: function(config) {
@@ -55,6 +62,7 @@ Ext.define('Zan.data.excelImport.ExcelImporter', {
     startImport: function() {
         this._chooseFilePopup = Ext.create('Zan.data.excelImport.ChooseFilePopup', {
             excelTemplate: this.getExcelTemplate(),
+            userMessageHtml: this.getUserMessageHtml(),
             listeners: {
                 fileSelected: function(fileButton, formData, fileDomEl, arrayBufferContent) {
                     // Add in any extraParams

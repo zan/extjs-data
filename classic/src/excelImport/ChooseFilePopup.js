@@ -15,6 +15,13 @@ Ext.define('Zan.data.excelImport.ChooseFilePopup', {
          * For example: Modules.MyBundle.ExcelImport.SomeExcelTemplate
          */
         excelTemplate: null,
+
+        /**
+         * @cfg {string} HTML to display in the Excel Import popup
+         *
+         * NOTE: No escaping is done on this field!
+         */
+        userMessageHtml: null,
     },
 
     referenceHolder: true,
@@ -36,6 +43,12 @@ Ext.define('Zan.data.excelImport.ChooseFilePopup', {
         labelWidth: 250,
     },
     items: [
+        {
+            xtype: 'panel',
+            reference: 'userMessage',
+            hidden: true, // shown in beforeRender if there's a userMessage
+            margin: '0 0 8 0',
+        },
         {
             xtype: 'fieldcontainer',
             fieldLabel: 'Step 1: Download the template',
@@ -76,5 +89,16 @@ Ext.define('Zan.data.excelImport.ChooseFilePopup', {
         this.lookup('fileUploadButton').on('fileSelected', function(fileButton, formData, fileDomEl, arrayBufferContent) {
             this.fireEvent('fileSelected', fileButton, formData, fileDomEl, arrayBufferContent);
         }, this);
+
+        if (this.getUserMessageHtml()) {
+            var noticeHtml = `
+                <div style="background: #FFFFE0; border: 1px solid #ffae00; padding: 4px; display: flex;">                    
+                    <div style="">${this.getUserMessageHtml()}</div>
+                </div>
+            `;
+
+            this.lookupReference('userMessage').setHtml(noticeHtml);
+            this.lookupReference('userMessage').show();
+        }
     },
 });
