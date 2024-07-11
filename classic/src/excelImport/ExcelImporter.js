@@ -49,6 +49,13 @@ Ext.define('Zan.data.excelImport.ExcelImporter', {
          * NOTE: No escaping is done on this field!
          */
         userMessageHtml: null,
+
+        /**
+         * @cfg {string} Custom URL to use when downloading the Excel template
+         *
+         * If set, the "Download" button goes to this URL instead of the server-generated one
+         */
+        customTemplateDownloadUrl: null,
     },
 
     constructor: function(config) {
@@ -63,6 +70,7 @@ Ext.define('Zan.data.excelImport.ExcelImporter', {
         this._chooseFilePopup = Ext.create('Zan.data.excelImport.ChooseFilePopup', {
             excelTemplate: this.getExcelTemplate(),
             userMessageHtml: this.getUserMessageHtml(),
+            customTemplateDownloadUrl: this.getCustomTemplateDownloadUrl(),
             listeners: {
                 fileSelected: function(fileButton, formData, fileDomEl, arrayBufferContent) {
                     // Add in any extraParams

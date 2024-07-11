@@ -22,7 +22,16 @@ Ext.define('Zan.data.excelImport.ChooseFilePopup', {
          * NOTE: No escaping is done on this field!
          */
         userMessageHtml: null,
+
+        /**
+         * @cfg {string} Custom URL to use when downloading the Excel template
+         *
+         * If set, the "Download" button goes to this URL instead of the server-generated one
+         */
+        customTemplateDownloadUrl: null,
     },
+
+    viewModel: {},
 
     referenceHolder: true,
 
@@ -57,6 +66,10 @@ Ext.define('Zan.data.excelImport.ChooseFilePopup', {
                     xtype: 'button',
                     reference: 'downloadTemplateButton',
                     text: 'Download Template',
+                    hrefTarget: '_blank',
+                    bind: {
+                        href: '{downloadTemplateHref}',
+                    }
                 }
             ]
         },
@@ -83,7 +96,12 @@ Ext.define('Zan.data.excelImport.ChooseFilePopup', {
         this.callParent(arguments);
 
         // Link download template to the correct location
-        this.lookup('downloadTemplateButton').setHref('/api/zan/drest/excel-import/' + encodeURIComponent(this.getExcelTemplate()));
+        if (!this.getCustomTemplateDownloadUrl()) {
+            this.getViewModel().set('downloadTemplateHref', '/api/zan/drest/excel-import/' + encodeURIComponent(this.getExcelTemplate()));
+            // Ext does not have a setter for this, so it cannot be bound. Workaround by clearing it here if it doesn't
+            // look like there will be a custom template
+            this.lookup('downloadTemplateButton').hrefTarget = '';
+        }
 
         // Re-fire the "file selected" event
         this.lookup('fileUploadButton').on('fileSelected', function(fileButton, formData, fileDomEl, arrayBufferContent) {
@@ -99,6 +117,15 @@ Ext.define('Zan.data.excelImport.ChooseFilePopup', {
 
             this.lookupReference('userMessage').setHtml(noticeHtml);
             this.lookupReference('userMessage').show();
+        }
+    },
+
+    updateCustomTemplateDownloadUrl: function(value) {
+        if (value) {
+            this.getViewModel().set('downloadTemplateHref', value);
+        }
+        else {
+            this.getViewModel().set('downloadTemplateHref', '/api/zan/drest/excel-import/' + encodeURIComponent(this.getExcelTemplate()));
         }
     },
 });
