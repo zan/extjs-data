@@ -47,11 +47,12 @@ Ext.define('Zan.data.page.apiViewer.ApiResponsePanel', {
         {
             xtype: 'panel',
             itemId: 'errorPanel',
-            //hidden: true,   // shown in loadResponseInfo
+            flex: 1,
+            hidden: true,   // shown in loadResponseInfo
             bind: {
                 hidden: '{responseInfo.requestSuccessful}',
             },
-            autoScroll: true,
+            scrollable: true,
             tbar: [
                 {
                     xtype: 'displayfield',
