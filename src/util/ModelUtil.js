@@ -167,10 +167,6 @@ Ext.define('Zan.data.util.ModelUtil', {
         var association = record.associations[fieldOrAssociation];
 
         if (!field && !association) {
-            setTimeout(function() {
-                console.log("Fields: %o", this.fieldsMap);
-                console.log("Associations: %o", this.associations);
-            }, 10);
             throw new Error("Field '" + fieldOrAssociation + "' does not exist on " + record.$className);
         }
 
@@ -223,6 +219,34 @@ Ext.define('Zan.data.util.ModelUtil', {
         }
         else {
             return record.set(fieldOrAssociation, value);
+        }
+    },
+
+    /**
+     * Looks up a dot-notation path on record and returns its value
+     *
+     * For example, these are equivalent:
+     *
+     *      user.getDepartment().get('label');
+     *
+     *      Zan.data.util.ModelUtil.resolveField(user, 'department.label');
+     *
+     * @param {Ext.data.Model} record
+     * @param {string} fieldOrAssociation
+     * @returns {*}
+     */
+    resolveField: function(record, fieldOrAssociation) {
+        var parts = fieldOrAssociation.split(".");
+        var value = Zan.data.util.ModelUtil.getValue(record, parts[0]);
+
+        // Reached the lowest level, return the value
+        if (parts.length === 1) {
+            return value;
+        }
+        // Recurse into the next level
+        else {
+            parts.shift();
+            return Zan.data.util.ModelUtil.resolveField(value, parts.join('.'));
         }
     },
 
