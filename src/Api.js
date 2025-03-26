@@ -173,7 +173,7 @@ Ext.define('Zan.data.Api', {
      */
     _resolveErrorCode: function(responseData, responseInfo) {
         // Easy case: rawResponse includes an errorCode
-        if (responseData.errorCode) return responseData.errorCode;
+        if (responseData && responseData.errorCode) return responseData.errorCode;
 
         return null;    // return null if there weren't any matches
     },
